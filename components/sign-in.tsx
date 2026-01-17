@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { authClient } from "@/lib/auth-client"
 import { useState } from "react"
-import { toast } from "sonner"
 import { Loader2 } from "lucide-react" // assuming lucide-react is installed with shadcn
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -23,9 +22,15 @@ export function SignIn() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
     const router = useRouter()
 
     const handleSignIn = async () => {
+        setError(null)
+        if (password.length < 8) {
+            setError("Password must be at least 8 characters long")
+            return
+        }
         setLoading(true)
         await authClient.signIn.email({
             email,
@@ -35,12 +40,12 @@ export function SignIn() {
                 setLoading(true)
             },
             onSuccess: () => {
-                toast.success("Signed in successfully")
                 router.push("/dashboard")
                 router.refresh()
             },
             onError: (ctx) => {
-                toast.error(ctx.error.message)
+                const message = ctx.error.message.replace(/^\[.*?\]\s*/, "")
+                setError(message)
                 setLoading(false)
             }
         })
@@ -48,16 +53,16 @@ export function SignIn() {
     }
 
     const handleSocialSignIn = async (provider: "github" | "google") => {
+        setError(null)
         await authClient.signIn.social({
             provider,
             callbackURL: "/dashboard"
         }, {
             onSuccess: () => {
-                toast.success("Signed in successfully")
                 router.push("/dashboard")
             },
             onError: (ctx) => {
-                toast.error(ctx.error.message)
+                setError(ctx.error.message)
             }
         })
     }
@@ -80,7 +85,10 @@ export function SignIn() {
                             placeholder="m@example.com"
                             required
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => {
+                                setEmail(e.target.value)
+                                setError(null)
+                            }}
                         />
                     </div>
                     <div className="grid gap-2">
@@ -92,9 +100,15 @@ export function SignIn() {
                             type="password"
                             required
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => {
+                                setPassword(e.target.value)
+                                setError(null)
+                            }}
                         />
                     </div>
+                    {error && (
+                        <div className="text-destructive text-sm">{error}</div>
+                    )}
                     <Button type="submit" className="w-full" onClick={handleSignIn} disabled={loading}>
                         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                         Login
