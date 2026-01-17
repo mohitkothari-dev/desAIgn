@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { authClient } from "@/lib/auth-client"
 import { useState } from "react"
-import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -25,11 +24,17 @@ export function SignUp() {
     const [password, setPassword] = useState("")
     const [passwordConfirmation, setPasswordConfirmation] = useState("")
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
     const router = useRouter()
 
     const handleSignUp = async () => {
+        setError(null)
         if (password !== passwordConfirmation) {
-            toast.error("Passwords do not match")
+            setError("Passwords do not match")
+            return
+        }
+        if (password.length < 8) {
+            setError("Password must be at least 8 characters long")
             return
         }
         setLoading(true)
@@ -42,12 +47,12 @@ export function SignUp() {
                 setLoading(true)
             },
             onSuccess: () => {
-                toast.success("Account created successfully")
                 router.push("/dashboard")
                 router.refresh()
             },
             onError: (ctx) => {
-                toast.error(ctx.error.message)
+                const message = ctx.error.message.replace(/^\[.*?\]\s*/, "")
+                setError(message)
                 setLoading(false)
             }
         })
@@ -55,16 +60,16 @@ export function SignUp() {
     }
 
     const handleSocialSignUp = async (provider: "github" | "google") => {
+        setError(null)
         await authClient.signIn.social({ // Social sign up is same as sign in
             provider,
             callbackURL: "/dashboard"
         }, {
             onSuccess: () => {
-                toast.success("Account created successfully")
                 router.push("/dashboard")
             },
             onError: (ctx) => {
-                toast.error(ctx.error.message)
+                setError(ctx.error.message)
             }
         })
     }
@@ -83,21 +88,29 @@ export function SignUp() {
                         <div className="grid gap-2">
                             <Label htmlFor="first-name">First name</Label>
                             <Input
+                                type="text"
                                 id="first-name"
                                 placeholder="Max"
                                 required
                                 value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
+                                onChange={(e) => {
+                                    setFirstName(e.target.value)
+                                    setError(null)
+                                }}
                             />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="last-name">Last name</Label>
                             <Input
+                                type="text"
                                 id="last-name"
                                 placeholder="Robinson"
                                 required
                                 value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
+                                onChange={(e) => {
+                                    setLastName(e.target.value)
+                                    setError(null)
+                                }}
                             />
                         </div>
                     </div>
@@ -109,7 +122,10 @@ export function SignUp() {
                             placeholder="m@example.com"
                             required
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => {
+                                setEmail(e.target.value)
+                                setError(null)
+                            }}
                         />
                     </div>
                     <div className="grid gap-2">
@@ -119,7 +135,10 @@ export function SignUp() {
                             type="password"
                             required
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => {
+                                setPassword(e.target.value)
+                                setError(null)
+                            }}
                         />
                     </div>
                     <div className="grid gap-2">
@@ -129,9 +148,15 @@ export function SignUp() {
                             type="password"
                             required
                             value={passwordConfirmation}
-                            onChange={(e) => setPasswordConfirmation(e.target.value)}
+                            onChange={(e) => {
+                                setPasswordConfirmation(e.target.value)
+                                setError(null)
+                            }}
                         />
                     </div>
+                    {error && (
+                        <div className="text-destructive text-sm">{error}</div>
+                    )}
                     <Button type="submit" className="w-full" onClick={handleSignUp} disabled={loading}>
                         {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                         Create an account
