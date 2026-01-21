@@ -9,7 +9,7 @@ export default function Home() {
           Welcome to DesAIgn
         </h1>
         <p className="text-xl text-muted-foreground max-w-[600px]">
-          Empower your creativity with AI-driven design tools. Join us today to start building the future.
+          Empower your creativity with a Vibe Design tool. Join us today to start building the future.
         </p>
         <div className="flex gap-4">
           <Link href="/sign-in">
