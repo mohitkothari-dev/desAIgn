@@ -47,7 +47,7 @@ const Header = () => {
           <Logo />
           <div className="flex flex-1 items-center justify-end gap-3">
             <Button 
-            className="relative rounded-full h-8 w-8"
+            className="relative rounded-full h-8 w-8 hover:cursor-pointer"
             variant="outline" size="icon" onClick={() => setTheme(isDark ? "light" : "dark")}>
               <SunIcon className={cn("absolute h-5 w-5 transition", isDark ? "scale-100" : "scale-0")} />
               <MoonIcon className={cn("absolute h-5 w-5 transition", isDark ? "scale-0" : "scale-100")} />

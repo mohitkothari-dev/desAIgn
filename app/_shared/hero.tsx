@@ -65,7 +65,6 @@ const Hero = () => {
             <div className="flex w-full max-w-3xl flex-col item-center gap-8 relative z-50">
               <div className="w-full px-2 sm:px-4 lg:px-6">
                 <PromptInput
-                  className="ring-2 ring-primary"
                   promptText={promptText}
                   setPromptText={setPromptText}
                   isLoading={false}
