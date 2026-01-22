@@ -1,10 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
-import PromptInput from "@/components/prompt-input";
+import AppPromptInput from "@/components/app-prompt-input";
+import { DeviceType } from "@/type/types";
 
 const Hero = () => {
   const [promptText, setPromptText] = useState<string>("");
+  const [device, setDevice] = useState<DeviceType>("mobile");
 
 
   const suggestions = [
@@ -44,7 +46,22 @@ const Hero = () => {
     setPromptText(val);
   };
 
-  
+  const onCreateProject = async () => {
+    if (!promptText) return;
+    const result = await fetch('/api/project', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userInput: promptText,
+        device: device,
+        projectId: crypto.randomUUID(),
+      }),
+    });
+    const data = await result.json();
+    console.log(data);
+  }
 
   return (
     <div className="w-full min-h-screen">
@@ -64,11 +81,13 @@ const Hero = () => {
             </div>
             <div className="flex w-full max-w-3xl flex-col item-center gap-8 relative z-50">
               <div className="w-full px-2 sm:px-4 lg:px-6">
-                <PromptInput
+                <AppPromptInput
                   promptText={promptText}
                   setPromptText={setPromptText}
                   isLoading={false}
-                  onSubmit={() => {}}
+                  onSubmit={onCreateProject}
+                  device={device}
+                  setDevice={setDevice}
                 />
               </div>
 

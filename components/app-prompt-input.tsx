@@ -88,19 +88,22 @@ interface PropsType {
   //className?: string; // used for ring-2 ring-primary, passed to outer container
   hideSubmitBtn?: boolean;
   onSubmit?: () => void;
+  device: DeviceType;
+  setDevice: (value: DeviceType) => void;
 }
 
-const PromptInput = ({
+const AppPromptInput = ({
   promptText,
   setPromptText,
   isLoading,
   //className,
   hideSubmitBtn = false,
   onSubmit,
+  device,
+  setDevice
 }: PropsType) => {
   const [model, setModel] = useState<string>(models[0].id);
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
-  const [device, setDevice] = useState<DeviceType>("mobile");
   
   const selectedModelData = models.find((m) => m.id === model);
 
@@ -207,6 +210,7 @@ const PromptInput = ({
                 <PromptInputSubmit 
                     status={isLoading ? "submitted" : "ready"} 
                     className="ml-auto"
+                    disabled={!promptText.trim() && !isLoading}
                 />
             )}
           </PromptInputFooter>
@@ -215,4 +219,4 @@ const PromptInput = ({
   );
 };
 
-export default PromptInput;
+export default AppPromptInput;
