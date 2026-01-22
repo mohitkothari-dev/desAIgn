@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, json, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -44,4 +44,15 @@ export const verification = pgTable("verification", {
   expiresAt: timestamp("expiresAt").notNull(),
   createdAt: timestamp("createdAt"),
   updatedAt: timestamp("updatedAt")
+});
+
+export const project = pgTable("project", {
+  id: text("id").primaryKey(),
+  projectId: varchar().notNull(),
+  userInput: varchar(),
+  device: varchar(),
+  config: json(),
+  createdAt: timestamp("createdAt").notNull(),
+  updatedAt: timestamp("updatedAt").notNull(),
+  userId: text("userId").notNull().references(() => user.id)
 });
