@@ -40,9 +40,11 @@ import {
   PromptInputTextarea,
   PromptInputTools,
   usePromptInputAttachments,
+  PromptInputProvider,
+  usePromptInputController,
 } from "@/components/ai-elements/prompt-input";
 import { CheckIcon} from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { cn } from "@/lib/utils";
 import { DeviceType } from "@/type/types";
 
@@ -56,10 +58,11 @@ const models = [
   },
 ];
 
+const SUBMITTING_TIMEOUT = 200;
+const STREAMING_TIMEOUT = 2000;
+
 const PromptInputAttachmentsDisplay = () => {
   const attachments = usePromptInputAttachments();
-
-
 
   if (attachments.files.length === 0) {
     return null;
@@ -92,7 +95,7 @@ interface PropsType {
   setDevice: (value: DeviceType) => void;
 }
 
-const AppPromptInput = ({
+const InternalPromptInput = ({
   promptText,
   setPromptText,
   isLoading,
@@ -104,15 +107,36 @@ const AppPromptInput = ({
 }: PropsType) => {
   const [model, setModel] = useState<string>(models[0].id);
   const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
+  const [status, setStatus] = useState<
+    "submitted" | "streaming" | "ready" | "error"
+  >("ready");
+  const { textInput } = usePromptInputController();
   
   const selectedModelData = models.find((m) => m.id === model);
 
-  const handleSubmit = (message: PromptInputMessage) => {
-    // Sync text if needed (though controlled)
-    if (message.text !== promptText) {
-      setPromptText(message.text);
+  // Sync external promptText with internal provider state
+  useEffect(() => {
+    if (textInput.value !== promptText) {
+      textInput.setInput(promptText);
     }
+  }, [promptText, textInput]);
+
+  const handleSubmit = (message: PromptInputMessage, event?: FormEvent<HTMLFormElement>) => {
+    // Call external onSubmit
     onSubmit?.();
+    
+    // Clear the input
+    setPromptText("");
+
+    setStatus("submitted");
+
+    setTimeout(() => {
+      setStatus("streaming");
+    }, SUBMITTING_TIMEOUT);
+
+    setTimeout(() => {
+      setStatus("ready");
+    }, STREAMING_TIMEOUT);
   };
 
   return (
@@ -208,9 +232,9 @@ const AppPromptInput = ({
             </PromptInputTools>
             {!hideSubmitBtn && (
                 <PromptInputSubmit 
-                    status={isLoading ? "submitted" : "ready"} 
+                    status={status} 
                     className="ml-auto"
-                    disabled={!promptText.trim() && !isLoading}
+                    disabled={!promptText.trim() && status === "ready"}
                 />
             )}
           </PromptInputFooter>
@@ -218,5 +242,13 @@ const AppPromptInput = ({
     </div>
   );
 };
+
+const AppPromptInput = (props: PropsType) => {
+    return (
+        <PromptInputProvider>
+            <InternalPromptInput {...props} />
+        </PromptInputProvider>
+    )
+}
 
 export default AppPromptInput;
