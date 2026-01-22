@@ -12,7 +12,11 @@ export default function Home() {
           Empower your creativity with a Vibe Design tool. Join us today to start building the future.
         </p>
         <p className="text-xl text-muted-foreground max-w-[500px]">
-          Invest in designing, so that you don't waste token while developing.</p>
+          Invest in designing, so that you don't waste token while developing.
+        </p>
+        <p className="text-xl text-muted-foreground max-w-[500px]">
+          Mockups, Wireframe and Sitemaps
+        </p>
         <div className="flex gap-4">
           <Link href="/sign-in">
             <Button size="lg">Sign In</Button>
