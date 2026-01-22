@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { DropdownMenuItem, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from "@/components/ui/dropdown-menu"
 import {
   Attachment,
   AttachmentPreview,
@@ -43,7 +37,7 @@ import {
   PromptInputProvider,
   usePromptInputController,
 } from "@/components/ai-elements/prompt-input";
-import { CheckIcon} from "lucide-react";
+import { CheckIcon, Monitor, MonitorSmartphone, Smartphone } from "lucide-react";
 import { useState, useEffect, FormEvent } from "react";
 import { cn } from "@/lib/utils";
 import { DeviceType } from "@/type/types";
@@ -161,30 +155,50 @@ const InternalPromptInput = ({
                 <PromptInputActionMenuTrigger />
                 <PromptInputActionMenuContent>
                   <PromptInputActionAddAttachments />
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <MonitorSmartphone className="mr-2 size-4" />
+                      Type
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          setDevice("mobile");
+                        }}
+                      >
+                        <Smartphone className="mr-2 size-4" />
+                        Mobile
+                        {device === "mobile" && <CheckIcon className="ml-auto size-4" />}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          setDevice("website");
+                        }}
+                      >
+                        <Monitor className="mr-2 size-4" />
+                        Website
+                        {device === "website" && <CheckIcon className="ml-auto size-4" />}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
                 </PromptInputActionMenuContent>
               </PromptInputActionMenu>
-              <Select value={device} onValueChange={(value) => setDevice(value as DeviceType)}>
-                <SelectTrigger className="w-[100px]">
-                  <SelectValue placeholder="Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mobile">Mobile</SelectItem>
-                  <SelectItem value="website">Website</SelectItem>
-                </SelectContent>
-              </Select>
+              
               <ModelSelector
                 onOpenChange={setModelSelectorOpen}
                 open={modelSelectorOpen}
               >
                 <ModelSelectorTrigger asChild>
-                  <PromptInputButton>
+                  <PromptInputButton className="h-auto">
                     {selectedModelData?.chefSlug && (
                       <ModelSelectorLogo
                         provider={selectedModelData.chefSlug}
                       />
                     )}
                     {selectedModelData?.name && (
-                      <ModelSelectorName>
+                      <ModelSelectorName className="max-w-[80px] sm:max-w-none whitespace-normal leading-tight text-center">
                         {selectedModelData.name}
                       </ModelSelectorName>
                     )}
