@@ -61,7 +61,7 @@ export default async function ProjectLayout({
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
               <BreadcrumbItem>
-                <BreadcrumbPage>{projectData.projectId /* there should be project name */}</BreadcrumbPage> 
+                <BreadcrumbPage>{projectData.projectName}</BreadcrumbPage> 
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
