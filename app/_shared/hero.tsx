@@ -3,11 +3,12 @@ import React, { useState } from "react";
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
 import AppPromptInput from "@/components/app-prompt-input";
 import { DeviceType } from "@/type/types";
+import { useRouter } from "next/navigation";
 
 const Hero = () => {
   const [promptText, setPromptText] = useState<string>("");
   const [device, setDevice] = useState<DeviceType>("mobile");
-
+  const router = useRouter();
 
   const suggestions = [
     {
@@ -56,11 +57,14 @@ const Hero = () => {
       body: JSON.stringify({
         userInput: promptText,
         device: device,
-        projectId: crypto.randomUUID(),
+        projectId: crypto.randomUUID(), 
+        projectName: "Test Project", 
       }),
     });
     const data = await result.json();
     console.log(data);
+
+    router.push(`/dashboard/project/${data.projectId.projectId}`);
   }
 
   return (

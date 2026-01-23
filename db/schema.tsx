@@ -49,6 +49,8 @@ export const verification = pgTable("verification", {
 export const project = pgTable("project", {
   id: text("id").primaryKey(),
   projectId: varchar().notNull(),
+  projectName: varchar(),
+  description: varchar(),
   userInput: varchar(),
   device: varchar(),
   config: json(),
