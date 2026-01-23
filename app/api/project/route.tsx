@@ -5,7 +5,7 @@ import { db } from "@/db";
 import { project } from "@/db/schema";
 
 export async function POST(req: NextRequest) {
-    const { userInput, device, projectId } = await req.json();
+    const { userInput, device, projectId, projectName } = await req.json();
     
     //get currently logged in user
     const session = await auth.api.getSession({
@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
         userInput: userInput,
         device: device,
         userId: user.id as string,
+        projectName: projectName,
         createdAt: new Date(),
         updatedAt: new Date(),
     }).returning({ projectId: project.projectId });
