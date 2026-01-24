@@ -1,4 +1,4 @@
-export const THEMES = {
+export const DEFAULT_THEMES = {
     AURORA_INK : {
         background: "#0b1020",
         foreground: "#f5f5f5",
@@ -238,5 +238,70 @@ export const THEME_NAMES = [
     "CYBER_NEON",
 ] as const;
 
-export type ThemeKey = keyof typeof THEMES;
-export type Theme = typeof THEMES[ThemeKey];
+// Legacy export for backward compatibility
+export const THEMES = DEFAULT_THEMES;
+
+// Type definitions for database-driven themes
+export type ThemeColors = {
+    background: string;
+    foreground: string;
+    card: string;
+    cardForeground: string;
+    popover: string;
+    popoverForeground: string;
+    primary: string;
+    primaryRgb: string;
+    primaryForeground: string;
+    secondary: string;
+    secondaryForeground: string;
+    muted: string;
+    mutedForeground: string;
+    accent: string;
+    accentForeground: string;
+    destructive: string;
+    destructiveForeground: string;
+    input: string;
+    ring: string;
+    radius: string;
+    chart: string[];
+};
+
+export type Theme = {
+    id: string;
+    name: string;
+    slug: string;
+    isSystem: boolean;
+    userId?: string | null;
+    colors: ThemeColors;
+    createdAt: Date;
+    updatedAt: Date;
+};
+
+export type ThemeKey = keyof typeof DEFAULT_THEMES;
+
+// Utility functions
+export function validateThemeColors(colors: any): boolean {
+    const hexColorRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+    const requiredFields = [
+        'background', 'foreground', 'card', 'cardForeground',
+        'popover', 'popoverForeground', 'primary', 'primaryForeground',
+        'secondary', 'secondaryForeground', 'muted', 'mutedForeground',
+        'accent', 'accentForeground', 'destructive', 'destructiveForeground',
+        'input', 'ring', 'radius'
+    ];
+
+    for (const field of requiredFields) {
+        if (!colors[field]) return false;
+        if (field !== 'radius' && field !== 'primaryRgb' && !hexColorRegex.test(colors[field])) {
+            return false;
+        }
+    }
+
+    if (!Array.isArray(colors.chart) || colors.chart.length === 0) return false;
+    
+    return true;
+}
+
+export function isSystemTheme(theme: Theme): boolean {
+    return theme.isSystem;
+}
