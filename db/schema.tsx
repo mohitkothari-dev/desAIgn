@@ -51,10 +51,47 @@ export const project = pgTable("project", {
   projectId: varchar().notNull(),
   projectName: varchar(),
   description: varchar(),
+  theme: varchar(),
   userInput: varchar(),
   device: varchar(),
   config: json(),
   createdAt: timestamp("createdAt").notNull(),
   updatedAt: timestamp("updatedAt").notNull(),
   userId: text("userId").notNull().references(() => user.id)
+});
+
+export const theme = pgTable("theme", {
+  id: text("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  isSystem: boolean("isSystem").notNull().default(false),
+  userId: text("userId").references(() => user.id),
+  
+  // Theme colors and configuration stored as JSON
+  colors: json("colors").notNull().$type<{
+    background: string;
+    foreground: string;
+    card: string;
+    cardForeground: string;
+    popover: string;
+    popoverForeground: string;
+    primary: string;
+    primaryRgb: string;
+    primaryForeground: string;
+    secondary: string;
+    secondaryForeground: string;
+    muted: string;
+    mutedForeground: string;
+    accent: string;
+    accentForeground: string;
+    destructive: string;
+    destructiveForeground: string;
+    input: string;
+    ring: string;
+    radius: string;
+    chart: string[];
+  }>(),
+  
+  createdAt: timestamp("createdAt").notNull(),
+  updatedAt: timestamp("updatedAt").notNull()
 });
