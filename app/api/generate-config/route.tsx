@@ -53,7 +53,7 @@ Remember to return ONLY valid JSON matching the specified structure.
         //update project table with project Name
         await db.update(project).set({
             projectName: object.projectName,
-            description: object.name,
+            description: object.description,
             updatedAt: new Date(),
         }).where(eq(project.projectId, projectId));
 

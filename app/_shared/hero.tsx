@@ -1,14 +1,36 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Suggestion, Suggestions } from "@/components/ai-elements/suggestion";
 import AppPromptInput from "@/components/app-prompt-input";
-import { DeviceType } from "@/type/types";
+import { DeviceType, ProjectType } from "@/type/types";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Loader2Icon, Clock } from "lucide-react";
 
 const Hero = () => {
   const [promptText, setPromptText] = useState<string>("");
   const [device, setDevice] = useState<DeviceType>("mobile");
+  const [recentProjects, setRecentProjects] = useState<ProjectType[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    fetchRecentProjects();
+  }, []);
+
+  const fetchRecentProjects = async () => {
+    try {
+      const response = await fetch('/api/project');
+      if (response.ok) {
+        const data = await response.json();
+        setRecentProjects(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch recent projects:", error);
+    } finally {
+      setLoadingProjects(false);
+    }
+  };
 
   const suggestions = [
     {
@@ -58,7 +80,7 @@ const Hero = () => {
         userInput: promptText,
         device: device,
         projectId: crypto.randomUUID(), 
-        projectName: "Test Project", 
+        projectName: "Untitled Project", 
       }),
     });
     const data = await result.json();
@@ -114,12 +136,50 @@ const Hero = () => {
           </div>
         </div>
         <div className="w-full py-10">
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-3xl px-4">
               <div>
-                <h1
-                  className="font-medium text-xl tracking-tight">
+                <h1 className="font-medium text-xl tracking-tight mb-6">
                   Recent Projects
                 </h1>
+                
+                {loadingProjects ? (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2Icon className="w-4 h-4 animate-spin" />
+                    <span>Loading your projects...</span>
+                  </div>
+                ) : recentProjects.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {recentProjects.map((project) => (
+                      <Link 
+                        key={project.id} 
+                        href={`/dashboard/project/${project.projectId}`}
+                        className="group flex flex-col p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-sm transition-all"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="font-semibold text-card-foreground group-hover:text-primary transition-colors">
+                            {project.projectName || "Untitled Project"}
+                          </h3>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider ${
+                            project.device === 'mobile' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                          }`}>
+                            {project.device}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                          {project.userInput}
+                        </p>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-auto">
+                          <Clock className="w-3.4 h-3.4" />
+                          <span>{new Date(project.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-10 border-2 border-dashed border-border rounded-2xl">
+                    <p className="text-muted-foreground">No projects found. Create your first design above!</p>
+                  </div>
+                )}
               </div>
           </div>
         </div>
