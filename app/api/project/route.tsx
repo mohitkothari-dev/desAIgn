@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { db } from "@/db";
 import { project, ScreenConfig } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
     const { userInput, device, projectId, projectName } = await req.json();
@@ -46,26 +46,39 @@ export async function GET(req: NextRequest) {
     const { user } = session;
 
     const projectId = req.nextUrl.searchParams.get("projectId");
-    console.log(`Fetching project: ${projectId} for user: ${user.id}`);
+
     try {
-        const result = await db.select().from(project).where(
-            and(
-                eq(project.userId, user.id as string), 
-                eq(project.projectId, projectId as string)
-            )
-        );
-        console.log(`Project search result: ${result.length} found`);
+        if (projectId) {
+            console.log(`Fetching project: ${projectId} for user: ${user.id}`);
+            const result = await db.select().from(project).where(
+                and(
+                    eq(project.userId, user.id as string), 
+                    eq(project.projectId, projectId as string)
+                )
+            );
+            console.log(`Project search result: ${result.length} found`);
 
-        const ScreenConf = await db.select().from(ScreenConfig).where(
-            eq(ScreenConfig.projectId, projectId as string)
-        );
-        console.log(`Screen configurations: ${ScreenConf.length} found`);
+            const ScreenConf = await db.select().from(ScreenConfig).where(
+                eq(ScreenConfig.projectId, projectId as string)
+            );
+            console.log(`Screen configurations: ${ScreenConf.length} found`);
 
-        return NextResponse.json({ 
-            project: result[0],
-            screenConfig: ScreenConf
-         });
+            return NextResponse.json({ 
+                project: result[0],
+                screenConfig: ScreenConf
+             });
+        } else {
+            console.log(`Fetching recent projects for user: ${user.id}`);
+            const result = await db.select()
+                .from(project)
+                .where(eq(project.userId, user.id as string))
+                .orderBy(desc(project.createdAt))
+                .limit(10);
+            
+            return NextResponse.json(result);
+        }
     } catch (error) {
+        console.error("Error fetching projects:", error);
         return NextResponse.json({ error: "Failed to fetch project" }, { status: 500 });
     }
 }
