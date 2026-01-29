@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { ProjectType } from "@/type/types";
+import { ProjectType, ScreenConfigType } from "@/type/types";
 import { Loader2Icon } from "lucide-react";
 
 const ProjectCanvasPlayground = () => {
   const {projectId} = useParams();
+  const [screenConfig, setScreenConfig] = useState<ScreenConfigType[]>([]);
   const [projectDetail, setProjectDetail] = useState<ProjectType>({
     id: "",
     projectId: "",
@@ -31,8 +32,42 @@ const ProjectCanvasPlayground = () => {
     setLoadingMessage("Fetching project details...");
     const result = await fetch(`/api/project?projectId=${projectId}`);
     const data = await result.json();
-    setProjectDetail(data);
+    setProjectDetail(data.project);
+    setScreenConfig(data.screenConfig);
+    // if (screenConfig.length === 0) {
+    //   generateScreenConfig();
+    // }
     setLoading(false);
+  }
+
+  useEffect(() => {
+    if (projectDetail?.projectId && screenConfig && screenConfig.length === 0) {
+      generateScreenConfig();
+    }
+  }, [projectDetail, screenConfig]);
+
+  const generateScreenConfig = async () => {
+    setLoading(true);
+    setLoadingMessage("Generating screen config...");
+    const result = await fetch(`/api/generate-config`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userInput: projectDetail.userInput,
+        device: projectDetail.device,
+        projectId: projectDetail.projectId,
+      }),
+    });
+
+    console.log("Result:", result);
+
+    const data = await result.json();
+    //setScreenConfig(data);
+    GetProjectDetail();
+    setLoading(false);
+    
   }
 
   return (
