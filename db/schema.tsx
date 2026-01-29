@@ -95,3 +95,14 @@ export const theme = pgTable("theme", {
   createdAt: timestamp("createdAt").notNull(),
   updatedAt: timestamp("updatedAt").notNull()
 });
+
+export const ScreenConfig = pgTable("screenConfig", {
+  id: text("id").primaryKey(),
+  projectId: varchar("projectId").notNull().references(() => project.projectId),
+  screenId: varchar("screenId"),
+  purpose: varchar("purpose"),
+  screenDescription: varchar("screenDescription"),
+  designIntent: json("designIntent"),
+  createdAt: timestamp("createdAt").notNull(),
+  updatedAt: timestamp("updatedAt").notNull(),
+})

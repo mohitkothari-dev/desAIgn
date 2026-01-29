@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { db } from "@/db";
-import { project } from "@/db/schema";
+import { project, ScreenConfig } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
@@ -33,22 +33,39 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+    console.log("GET /api/project hit");
     const session = await auth.api.getSession({
         headers: await headers()
     });
 
     if(!session) {
+        console.log("Unauthorized request to /api/project");
         return new Response("Unauthorized", { status: 401 });
     }
 
     const { user } = session;
 
-    const projectId = await req.nextUrl.searchParams.get("projectId");
+    const projectId = req.nextUrl.searchParams.get("projectId");
+    console.log(`Fetching project: ${projectId} for user: ${user.id}`);
     try {
-        const result = await db.select().from(project).where(and(eq(project.userId, user?.email as string), 
-        eq(project.projectId, projectId as string)));
-        return NextResponse.json({ projects: result[0] });
+        const result = await db.select().from(project).where(
+            and(
+                eq(project.userId, user.id as string), 
+                eq(project.projectId, projectId as string)
+            )
+        );
+        console.log(`Project search result: ${result.length} found`);
+
+        const ScreenConf = await db.select().from(ScreenConfig).where(
+            eq(ScreenConfig.projectId, projectId as string)
+        );
+        console.log(`Screen configurations: ${ScreenConf.length} found`);
+
+        return NextResponse.json({ 
+            project: result[0],
+            screenConfig: ScreenConf
+         });
     } catch (error) {
-        return NextResponse.json({ error: error });
+        return NextResponse.json({ error: "Failed to fetch project" }, { status: 500 });
     }
 }

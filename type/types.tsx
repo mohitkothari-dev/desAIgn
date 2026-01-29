@@ -11,3 +11,15 @@ export type ProjectType = {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export type ScreenConfigType = {
+    id: string;
+    projectId: string;
+    screenId: string;
+    screenName: string;
+    purpose: string;
+    screenDescription: string;
+    designIntent: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
