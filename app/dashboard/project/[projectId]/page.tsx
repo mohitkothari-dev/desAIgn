@@ -9,6 +9,7 @@ import Canvas from "./_shared/canvas";
 const ProjectCanvasPlayground = () => {
   const {projectId} = useParams();
   const [screenConfig, setScreenConfig] = useState<ScreenConfigType[]>([]);
+  const [screenConfigOriginal, setScreenConfigOriginal] = useState<ScreenConfigType[]>([]);
   const [projectDetail, setProjectDetail] = useState<ProjectType>({
     id: "",
     projectId: "",
@@ -35,6 +36,7 @@ const ProjectCanvasPlayground = () => {
     const data = await result.json();
     setProjectDetail(data.project);
     setScreenConfig(data.screenConfig);
+    setScreenConfigOriginal(data.screenConfig);
     // if (screenConfig.length === 0) {
     //   generateScreenConfig();
     // }
@@ -42,10 +44,10 @@ const ProjectCanvasPlayground = () => {
   }
 
   useEffect(() => {
-    if (projectDetail?.projectId && screenConfig && screenConfig.length === 0) {
+    if (projectDetail?.projectId && screenConfigOriginal &&  screenConfigOriginal.length === 0) {
       generateScreenConfig();
     }
-  }, [projectDetail, screenConfig]);
+  }, [projectDetail, screenConfigOriginal]);
 
   const generateScreenConfig = async () => {
     setLoading(true);
@@ -77,7 +79,7 @@ const ProjectCanvasPlayground = () => {
         <h2 className="flex items-center gap-2"><Loader2Icon className="animate-spin" /> {loadingMessage}</h2>
         {/* ShadCN UI sheet: use symbols at the bottom of the screen to open the sheet  */}
       </div>}
-      <Canvas />
+      <Canvas projectDetail={projectDetail} screenConfig={screenConfig} />
     </div>
   )
 }
