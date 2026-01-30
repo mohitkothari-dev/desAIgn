@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ProjectType, ScreenConfigType } from "@/type/types";
 import { Loader2Icon } from "lucide-react";
+import Canvas from "./_shared/canvas";
 
 const ProjectCanvasPlayground = () => {
   const {projectId} = useParams();
@@ -76,6 +77,7 @@ const ProjectCanvasPlayground = () => {
         <h2 className="flex items-center gap-2"><Loader2Icon className="animate-spin" /> {loadingMessage}</h2>
         {/* ShadCN UI sheet: use symbols at the bottom of the screen to open the sheet  */}
       </div>}
+      <Canvas />
     </div>
   )
 }
