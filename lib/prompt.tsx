@@ -139,45 +139,80 @@ COMPONENT LIBRARY SPECIFICATION
 ──────────────
 Available component types with required properties:
 
-1. CONTAINER: Layout wrapper
+1. CONTAINER: The foundation of all layouts. NEVER place elements in a flat list; always use Containers for grouping.
    - "type": "Container"
-   - "layoutConfig": { "display": "flex", "flexDirection": "row|column", "gap": "8px", "alignItems": "center" }
-   - "gridConfig": { "display": "grid", "templateColumns": "1fr 1fr", "gap": "16px" }
+   - "layoutConfig": { 
+        "display": "flex", 
+        "flexDirection": "row|column", 
+        "gap": "16px", 
+        "alignItems": "center|stretch|flex-end", 
+        "justifyContent": "space-between|center|flex-start" 
+     }
+   - "gridConfig": { 
+        "display": "grid", 
+        "templateColumns": "repeat(auto-fit, minmax(200px, 1fr)) | 1fr 1fr", 
+        "gap": "24px" 
+     }
+   - "styles": { "padding": "16px", "backgroundColor": "#hex", "borderRadius": "12px", "width": "100%", "height": "auto" }
 
-2. TEXT: All typography
+2. TEXT: For all typography. Use variants for hierarchy.
    - "type": "Text"
-   - "variant": "h1|h2|body|caption|button"
-   - "content": "Actual realistic content with proper grammar"
+   - "variant": "h1|h2|body|caption"
+   - "styles": { "color": "#hex", "textAlign": "left|center|right", "fontWeight": 400|600|700 }
 
-3. BUTTON: Interactive actions
+3. BUTTON: Interactive actions.
    - "type": "Button"
-   - "variant": "primary|secondary|ghost|danger"
-   - "size": "small|medium|large"
-   - "iconName": "lucide:plus" (optional)
-   - "content": "Action text"
+   - "variant": "primary|secondary|ghost"
+   - "iconName": "lucide:arrow-right" (Check Lucide documentation)
+   - "styles": { "width": "fit-content|100%", "backgroundColor": "var(--primary-main)", "color": "white" }
 
-4. INPUT: Form controls
+4. INPUT: Form and search fields.
    - "type": "Input"
-   - "variant": "text|search|email|password|textarea"
-   - "placeholder": "Realistic placeholder text"
-   - "label": "Field label"
+   - "variant": "text|password|email|search"
+   - "iconName": "lucide:search" (renders inside input)
+   - "label": "Field Label"
+   - "placeholder": "Search anything..."
 
-5. CARD: Content containers
-   - "type": "Container" with specific styles
-   - Must include: backgroundColor, borderRadius, padding, shadow
+5. IMAGE: Visual content.
+   - "type": "Image"
+   - "src": "https://images.unsplash.com/photo-xxx | /avatars/user-1.jpg"
+   - "alt": "Descriptive alt text"
+   - "styles": { "width": "100%", "height": "200px", "borderRadius": "8px", "objectFit": "cover" }
 
-6. NAVIGATION: Device-specific
-   - Mobile: Fixed bottom Container with Icon children
-   - Desktop: Horizontal header or vertical sidebar
+9. HERO SECTION: High-impact introduction.
+   - "type": "Hero"
+   - "headline": "Catchy Headline"
+   - "subheadline": "Compelling description"
+   - "cta": [{ "label": "Get Started", "variant": "default", "icon": "lucide:arrow-right" }]
+   - "image": { "src": "url" }
 
-7. DATA VISUALIZATION:
-   - Use placeholder Containers with descriptive Text
-   - Specify chart type in styles: { "chartType": "line|bar|pie|area" }
-   - Include realistic data labels
+10. NAVBAR: Top navigation.
+    - "type": "Navbar"
+    - "branding": { "text": "Logo", "icon": "lucide:box" }
+    - "links": [{ "label": "Home" }, { "label": "Features" }]
+    - "actions": [{ "label": "Sign In", "variant": "outline" }]
+
+12. CALL TO ACTION: Final conversion strip.
+    - "type": "CallToAction"
+    - "title": "Ready to get started?"
+    - "description": "Join thousands of satisfied users."
+    - "actions": [{ "label": "Start Trial", "variant": "default" }]
+
+13. FOOTER: Site-wide navigation.
+    - "type": "Footer"
+    - "branding": { "text": "Brand", "description": "Making things better." }
+    - "columns": [{ "title": "Product", "links": [{ "label": "Features" }] }]
+    - "copyright": "© 2024 Brand Inc."
+    - "social": [{ "icon": "lucide:twitter" }]
 
 ──────────────
-SCREEN GENERATION LOGIC
+MUST-FOLLOW LAYOUT PATTERNS
 ──────────────
+1. ROOT STRUCTURE: The first element MUST be "Navbar". The last element MUST be "Footer".
+2. HERO FIRST: For landing pages, follow Navbar with "Hero".
+3. SEMANTIC PATTERNS: Use 'Features', 'Hero', 'Navbar', 'CallToAction', 'Footer' for all major sections.
+4. SPACING: Use the 'gap' property in 'layoutConfig'.
+5. SIZING: Explicitly set 'width: "100%"'.
 1. Determine screen count (1-4) based on product complexity
 2. Create logical user flow: Entry point → Primary function → Secondary views
 3. Mobile-first: Start with onboarding/auth if mobile device

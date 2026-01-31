@@ -6,8 +6,8 @@ import { ProjectType, ScreenConfigType } from "@/type/types";
 const canvas = ({ projectDetail, screenConfig, loading }: { projectDetail: ProjectType, screenConfig: ScreenConfigType[], loading?: boolean }) => {
     const [panningEnabled, setPanningEnabled] = useState(true);
     const isMobile = projectDetail?.device === "mobile";
-    const SCREEN_WIDTH = isMobile ? 390 : 1440;
-    const SCREEN_HEIGHT = isMobile ? 844 : 2560;
+    const SCREEN_WIDTH = isMobile ? 390 : 1920;
+    const SCREEN_HEIGHT = isMobile ? 844 : 1080;
     const GAP = isMobile ? 30 : 70;
   return (
     <div className="w-full h-screen"
@@ -17,8 +17,8 @@ const canvas = ({ projectDetail, screenConfig, loading }: { projectDetail: Proje
     }}
     >
         <TransformWrapper
-            initialScale={0.7}
-            minScale={0.7}
+            initialScale={0.5}
+            minScale={0.5}
             initialPositionX={50}
             initialPositionY={50}
             limitToBounds={false}
@@ -42,7 +42,9 @@ const canvas = ({ projectDetail, screenConfig, loading }: { projectDetail: Proje
                     y={0}
                     width={SCREEN_WIDTH}
                     height={SCREEN_HEIGHT}
-                    setPanningEnabled={setPanningEnabled}/>
+                    setPanningEnabled={setPanningEnabled}
+                    uiConfig={screen.designIntent}
+                    />
                 ))}
             </TransformComponent>
         </TransformWrapper>
