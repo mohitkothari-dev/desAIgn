@@ -21,6 +21,9 @@ import { notFound, redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 
+import { ProjectProvider } from "./project-context"
+import { ScreenConfig } from "@/db/schema"
+
 export default async function ProjectLayout({
   children,
   params,
@@ -40,36 +43,39 @@ export default async function ProjectLayout({
   }
 
   const [projectData] = await db.select().from(project).where(eq(project.projectId, projectId));
+  const screenConfigs = await db.select().from(ScreenConfig).where(eq(ScreenConfig.projectId, projectId));
 
   if (!projectData) {
      notFound();
   }
 
   return (
-    <SidebarProvider>
-      <AppSidebar project={projectData} user={session.user} />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/dashboard">
-                  Dashboard
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{projectData.projectName}</BreadcrumbPage> 
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          {children}
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+    <ProjectProvider initialProject={projectData as any} initialScreenConfigs={screenConfigs as any}>
+        <SidebarProvider>
+          <AppSidebar project={projectData} user={session.user} />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+              <SidebarTrigger className="-ml-1" />
+              <Separator orientation="vertical" className="mr-2 h-4" />
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem className="hidden md:block">
+                    <BreadcrumbLink href="/dashboard">
+                      Dashboard
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator className="hidden md:block" />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{projectData.projectName}</BreadcrumbPage> 
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </header>
+            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+              {children}
+            </div>
+          </SidebarInset>
+        </SidebarProvider>
+    </ProjectProvider>
   )
 }
