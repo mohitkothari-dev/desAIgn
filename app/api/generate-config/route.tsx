@@ -41,18 +41,22 @@ Remember to return ONLY valid JSON matching the specified structure.
         console.log("Generated Object successfully");
         console.log("Final Generated Object:", JSON.stringify(object, null, 2));
 
-        //Save the generated object into the DB
-        const result = await db.insert(ScreenConfig).values({
+        // Save EACH screen as a separate row in the DB
+        const screenInserts = object.screens?.map((screen: any) => ({
             id: crypto.randomUUID(),
             projectId: projectId,
-            //Access the first screen in the array
-            screenId: object.screens?.[0]?.id || "",
-            purpose: object.screens?.[0]?.purpose || "",
-            screenDescription: object.screens?.[0]?.name || "",
-            designIntent: object,
+            screenId: screen.id || "",
+            purpose: screen.purpose || "",
+            screenDescription: screen.name || "",
+            designIntent: { 
+                ...object, 
+                screens: [screen] // Each row contains only its own screen
+            },
             createdAt: new Date(),
             updatedAt: new Date(),
-        }).returning({ screenId: ScreenConfig.screenId });
+        })) || [];
+
+        const result = await db.insert(ScreenConfig).values(screenInserts).returning({ screenId: ScreenConfig.screenId });
 
         //update project table with project Name
         await db.update(project).set({
