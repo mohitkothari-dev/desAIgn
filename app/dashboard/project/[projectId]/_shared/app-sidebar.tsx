@@ -57,14 +57,24 @@ type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     }
 }
 
+import { useProjectContext } from "../project-context";
+
 export function AppSidebar({ project, user, ...props }: AppSidebarProps) {
     const router = useRouter();
+    const { themes: contextThemes, updateTheme, project: contextProject } = useProjectContext();
 
-    const [themes, setThemes] = React.useState<Theme[]>([]);
-    const [selectedTheme, setSelectedTheme] = React.useState<string>("");
+    // Use context themes if available, otherwise empty (though context should ideally load them)
+    // We keep local state for "themes" to support the optimistic update from "create" if we want, 
+    // but better to just use contextThemes.
+    
+    // We need 'themes' variable for the map below.
+    const themes = contextThemes;
+
+    const selectedTheme = contextProject?.theme || "";
+    
     const [projectName, setProjectName] = React.useState<string>('');
     const [userNewScreenInput, setUserNewScreenInput] = React.useState<string>('');
-    const [isLoading, setIsLoading] = React.useState(true);
+    // const [isLoading, setIsLoading] = React.useState(true); // Handled by context
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [isCreating, setIsCreating] = React.useState(false);
 
@@ -94,32 +104,6 @@ export function AppSidebar({ project, user, ...props }: AppSidebarProps) {
         chart: ["#7c5cff", "#2fe6c7", "#ffb84d", "#ff4d6d", "#66a6ff"]
     });
 
-    // Fetch themes from database
-    React.useEffect(() => {
-        fetchThemes();
-    }, []);
-
-    const fetchThemes = async () => {
-        try {
-            setIsLoading(true);
-            const response = await fetch('/api/themes');
-            const data = await response.json();
-            
-            if (response.ok) {
-                setThemes(data.themes);
-                if (data.themes.length > 0 && !selectedTheme) {
-                    setSelectedTheme(data.themes[0].id);
-                }
-            } else {
-                console.error('Failed to fetch themes:', data.error);
-            }
-        } catch (error) {
-            console.error('Error fetching themes:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const handleCreateTheme = async () => {
         if (!newThemeName.trim()) {
             alert('Please enter a theme name');
@@ -143,8 +127,9 @@ export function AppSidebar({ project, user, ...props }: AppSidebarProps) {
 
             if (response.ok) {
                 // Add new theme to list and select it
-                setThemes([...themes, data.theme]);
-                setSelectedTheme(data.theme.id);
+                // We need to refresh context to get the new theme? 
+                // ideally context should expose a way to add theme or we reload
+                window.location.reload(); // Simple brute force for now to get new theme in context
                 
                 // Reset form and close dialog
                 setNewThemeName('');
@@ -261,7 +246,7 @@ export function AppSidebar({ project, user, ...props }: AppSidebarProps) {
                             </div>
                             
                             <ScrollArea className="h-[200px]">
-                                {isLoading ? (
+                                {false ? ( // Removing loading state for now as context is preloaded
                                     <div className="text-center py-4 text-muted-foreground">
                                         Loading themes...
                                     </div>
@@ -271,7 +256,7 @@ export function AppSidebar({ project, user, ...props }: AppSidebarProps) {
                                             <div 
                                                 key={theme.id} 
                                                 className={`p-3 border rounded-2xl mb-2 cursor-pointer ${selectedTheme === theme.id ? "border-primary bg-primary/10" : ""}`} 
-                                                onClick={() => setSelectedTheme(theme.id)}
+                                                onClick={() => updateTheme(theme.id)}
                                             >
                                                 <div className="flex justify-between items-start">
                                                     <h3 className="font-medium">{theme.name}</h3>

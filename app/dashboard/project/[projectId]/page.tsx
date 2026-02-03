@@ -2,84 +2,65 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { ProjectType, ScreenConfigType } from "@/type/types";
 import { Loader2Icon } from "lucide-react";
 import Canvas from "./_shared/canvas";
+import { useProjectContext } from "./project-context";
 
 const ProjectCanvasPlayground = () => {
   const {projectId} = useParams();
-  const [screenConfig, setScreenConfig] = useState<ScreenConfigType[]>([]);
-  const [screenConfigOriginal, setScreenConfigOriginal] = useState<ScreenConfigType[]>([]);
-  const [projectDetail, setProjectDetail] = useState<ProjectType>({
-    id: "",
-    projectId: "",
-    userInput: "",
-    device: "mobile",
-    userId: "",
-    projectName: "",
-    theme: "",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
-
-  const [loading, setLoading] = useState(true);
+  const { project, screenConfigs, setScreenConfigs, refreshData, isLoading: contextLoading } = useProjectContext();
+  
   const [loadingMessage, setLoadingMessage] = useState("Loading...");
+  // Local loading state for generation process
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
-    projectId && GetProjectDetail();
-  }, [projectId]);
-
-  const GetProjectDetail = async () => {
-    setLoading(true);
-    setLoadingMessage("Fetching project details...");
-    const result = await fetch(`/api/project?projectId=${projectId}`);
-    const data = await result.json();
-    setProjectDetail(data.project);
-    setScreenConfig(data.screenConfig);
-    setScreenConfigOriginal(data.screenConfig);
-    // if (screenConfig.length === 0) {
-    //   generateScreenConfig();
-    // }
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    if (projectDetail?.projectId && screenConfigOriginal &&  screenConfigOriginal.length === 0) {
+    if (project?.projectId && screenConfigs && screenConfigs.length === 0 && !isGenerating) {
       generateScreenConfig();
     }
-  }, [projectDetail, screenConfigOriginal]);
+  }, [project, screenConfigs]);
 
   const generateScreenConfig = async () => {
-    setLoading(true);
-    setLoadingMessage("Generating screen config...");
-    const result = await fetch(`/api/generate-config`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userInput: projectDetail.userInput,
-        device: projectDetail.device,
-        projectId: projectDetail.projectId,
-      }),
-    });
-
-    console.log("Result:", result);
-
-    const data = await result.json();
-    //setScreenConfig(data);
-    GetProjectDetail();
-    setLoading(false);
+    if (!project) return;
     
+    setIsGenerating(true);
+    setLoadingMessage("Generating screen config...");
+    
+    try {
+        const result = await fetch(`/api/generate-config`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            userInput: project.userInput,
+            device: project.device,
+            projectId: project.projectId,
+        }),
+        });
+
+        console.log("Result:", result);
+
+        const data = await result.json();
+        // Refresh context data to get the new screens
+        refreshData();
+    } catch (e) {
+        console.error("Error generating config:", e);
+    } finally {
+        setIsGenerating(false);
+    }
   }
+
+  const isLoading = contextLoading || isGenerating; // or simple logic
+
+  if (!project) return <div>Loading project...</div>;
 
   return (
     <div>
-      {loading && <div className="p-3 bg-foreground text-background border-b-blue-600 rounded-xl absolute top-19 left-1/2 transform -translate-x-1/2">
+      {isLoading && <div className="p-3 bg-foreground text-background border-b-blue-600 rounded-xl absolute top-19 left-1/2 transform -translate-x-1/2">
         <h2 className="flex items-center gap-2"><Loader2Icon className="animate-spin" /> {loadingMessage}</h2>
-        {/* ShadCN UI sheet: use symbols at the bottom of the screen to open the sheet  */}
       </div>}
-      <Canvas projectDetail={projectDetail} screenConfig={screenConfig} />
+      <Canvas projectDetail={project} screenConfig={screenConfigs} loading={isLoading} />
     </div>
   )
 }
