@@ -2,6 +2,9 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import ScreenFrame from "./screen-frame";
 import { useState } from "react";
 import { ProjectType, ScreenConfigType } from "@/type/types";
+import { useControls } from "react-zoom-pan-pinch";
+import { Plus, Minus, X, RefreshCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const canvas = ({ projectDetail, screenConfig, loading }: { projectDetail: ProjectType, screenConfig: ScreenConfigType[], loading?: boolean }) => {
     const [panningEnabled, setPanningEnabled] = useState(true);
@@ -9,6 +12,18 @@ const canvas = ({ projectDetail, screenConfig, loading }: { projectDetail: Proje
     const SCREEN_WIDTH = isMobile ? 390 : 1920;
     const SCREEN_HEIGHT = isMobile ? 844 : 1080;
     const GAP = isMobile ? 30 : 70;
+
+    const Controls = () => {
+        const { zoomIn, zoomOut, resetTransform } = useControls();
+
+        return (
+            <div className="tools absolute shadow p-2 px-3 flex gap-3 rounded-4xl bottom-10 bg-foreground text-background left-1/2 z-50">
+                <Button onClick={() => zoomIn()}><Plus /></Button>
+                <Button onClick={() => zoomOut()}><Minus /></Button>
+      <Button onClick={() => resetTransform()}><RefreshCcw /></Button>
+    </div>
+  );
+};
   return (
     <div className="w-full h-screen"
     style={{
@@ -30,6 +45,13 @@ const canvas = ({ projectDetail, screenConfig, loading }: { projectDetail: Proje
             }}
             panning={{disabled: !panningEnabled }}
         >
+            {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
+        <>
+          <Controls />
+          <TransformComponent>
+            <img src="image.jpg" alt="test" />
+            <div>Example text</div>
+          </TransformComponent>
             <TransformComponent
             wrapperStyle={{
                 width: "100%",
@@ -47,6 +69,8 @@ const canvas = ({ projectDetail, screenConfig, loading }: { projectDetail: Proje
                     />
                 ))}
             </TransformComponent>
+            </>
+      )}
         </TransformWrapper>
     </div>
   )
