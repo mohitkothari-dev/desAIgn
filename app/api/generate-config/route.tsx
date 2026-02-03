@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateText } from "ai";
 import { activeGeminiModel } from "@/lib/gemini";
-import { PROFESSIONAL_DESIGN_INTENT_PROMPT } from "@/lib/prompt";
+import { MOBILE_DESIGN_PROMPT, WEBSITE_DESIGN_PROMPT } from "@/lib/prompt";
 import { db } from "@/db";
 import { ScreenConfig, project } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -13,11 +13,15 @@ export async function POST(request: NextRequest) {
         console.log("Received request body:", JSON.stringify(body, null, 2));
         const { userInput, device, projectId } = body;
 
-        console.log("Using model for generation...");
+        console.log(`Using model for generation for device: ${device}`);
+
+        const systemPrompt = (device === "mobile" || device === "tablet")
+            ? MOBILE_DESIGN_PROMPT
+            : WEBSITE_DESIGN_PROMPT;
 
         const { text } = await generateText({
             model: activeGeminiModel,
-            system: PROFESSIONAL_DESIGN_INTENT_PROMPT,
+            system: systemPrompt,
             prompt: `
 ──────────────
 TASK
