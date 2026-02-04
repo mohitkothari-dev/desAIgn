@@ -359,6 +359,21 @@ const VisualComponent = ({ component }: { component: ComponentProps }) => {
       );
 
     case 'Image':
+        // Handle case where AI puts an icon name as an image source
+        if (src && src.startsWith('lucide:')) {
+             return (
+                 <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'var(--muted)',
+                    ...combinedStyles
+                 }}>
+                    <LucideIcon name={src} size={24} />
+                 </div>
+             );
+        }
+
         return (
             <img 
                 src={src || '/placeholder.svg'} 
