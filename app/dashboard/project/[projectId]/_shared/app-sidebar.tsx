@@ -3,9 +3,9 @@
 import * as React from "react"
 import {
   Sparkle,
-  Camera,
   Share,
-  Plus
+  Plus,
+  Camera
 } from "lucide-react"
 
 import {
@@ -18,6 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useRouter } from "next/navigation"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button";
+import { toJpeg } from "html-to-image";
 import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
@@ -31,6 +32,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { ThemeColors } from "@/lib/themes"
+import { toast } from "sonner"; 
 
 type Theme = {
     id: string;
@@ -142,6 +144,44 @@ export function AppSidebar({ project, user, ...props }: AppSidebarProps) {
             alert('Failed to create theme');
         } finally {
             setIsCreating(false);
+        }
+    };
+
+    const handleScreenshot = async () => {
+        const node = document.getElementById('canvas-capture-area');
+        if (!node) {
+            toast.error("Could not find canvas to capture. Make sure the design is loaded.");
+            return;
+        }
+
+        const loadingToast = toast.loading("Capturing screenshot...");
+
+        try {
+            // Give a tiny bit of time for any pending renders
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // We use toJpeg but toPng is also fine. 
+            // The key is providing the explicit dimensions of the target node.
+            const dataUrl = await toJpeg(node, {
+                quality: 0.95,
+                cacheBust: true,
+                backgroundColor: '#f0f0f0',
+                width: node.scrollWidth,
+                height: node.scrollHeight,
+                style: {
+                    transform: 'none', // Critical: reset any scale/translate during capture
+                }
+            });
+            
+            const link = document.createElement('a');
+            link.download = `project-${project.projectId}-design.jpg`;
+            link.href = dataUrl;
+            link.click();
+            
+            toast.success("Screenshot saved!", { id: loadingToast });
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to capture screenshot", { id: loadingToast });
         }
     };
 
@@ -287,9 +327,9 @@ export function AppSidebar({ project, user, ...props }: AppSidebarProps) {
                         <div className="mt-2">
                             <h2>Export Options</h2>
                             <div className="flex gap-3">
-                                <Button className="mt-2">
-                                    <Camera/> Screenshot
-                                </Button>                            
+                                <Button className="mt-2" onClick={handleScreenshot}>
+                                    <Camera /> Screenshot
+                                </Button>                         
                                 <Button className="mt-2">
                                     <Share /> Share
                                 </Button>
