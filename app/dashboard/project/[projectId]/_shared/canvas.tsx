@@ -75,6 +75,7 @@ const canvas = ({ projectDetail, screenConfig, loading }: { projectDetail: Proje
                              uiConfig={screen.designIntent}
                              screenName={screen.screenName}
                              projectId={projectDetail.id}
+                             screenId={screen.id}
                              />
                          ))}
                     </div>
