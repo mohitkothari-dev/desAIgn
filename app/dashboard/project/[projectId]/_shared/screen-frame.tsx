@@ -1,18 +1,28 @@
 import React from "react"
-import { GripVertical, Code, Copy, Check, Trash2 } from "lucide-react"
+import { GripVertical, Code, Copy, Check, Trash2, Sparkle, Loader2 } from "lucide-react"
 import { Rnd } from "react-rnd"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 import ScreenRenderer from "./screen-renderer"
 import { generateReactCode } from "./code-generator"
 
 import { useProjectContext } from "../project-context"
 import { toast } from "sonner"
+import { Textarea } from "@/components/ui/textarea"
 
-const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenName, projectId}: {x: number, y: number, width: number, height: number, setPanningEnabled: (enabled: boolean) => void, uiConfig: any, screenName: string, projectId: string}) => {
+const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenName, projectId, screenId}: {x: number, y: number, width: number, height: number, setPanningEnabled: (enabled: boolean) => void, uiConfig: any, screenName: string, projectId: string, screenId: string}) => {
   const [copied, setCopied] = React.useState(false);
+  const [userInput, setUserInput] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [popoverOpen, setPopoverOpen] = React.useState(false);
   const { refreshData } = useProjectContext();
   const code =  React.useMemo(() => generateReactCode(uiConfig), [uiConfig]);
 
@@ -27,7 +37,7 @@ const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenNa
     try {
         const response = await fetch("/api/delete-screen", {
             method: "DELETE",
-            body: JSON.stringify({ screenName, projectId }),
+            body: JSON.stringify({ screenId, projectId }),
         });
         if (response.ok) {
             toast.success("Screen deleted successfully", { id: loadingToast });
@@ -38,6 +48,30 @@ const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenNa
     } catch (error) {
         console.error("Error deleting screen:", error);
         toast.error("Error deleting screen", { id: loadingToast });
+    }
+  }
+
+  const regerateScreen = async () => {
+    const loadingToast = toast.loading("Regenerating screen...");
+    setLoading(true);
+    try {
+        const response = await fetch("/api/regenerate-screen", {
+            method: "POST",
+            body: JSON.stringify({ screenId, projectId, userInput }),
+        });
+        if (response.ok) {
+            toast.success("Screen regenerated successfully", { id: loadingToast });
+            refreshData();
+            setPopoverOpen(false);
+            setUserInput("");
+        } else {
+            toast.error("Failed to regenerate screen", { id: loadingToast });
+        }
+    } catch (error) {
+        console.error("Error regenerating screen:", error);
+        toast.error("Error regenerating screen", { id: loadingToast });
+    } finally {
+        setLoading(false);
     }
   }
   
@@ -72,6 +106,33 @@ const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenNa
             </div>
             
             <Dialog>
+                <div className="flex flex-row gap-1">
+                    <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                    <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <Sparkle className="w-4 h-4 text-black" />
+                    </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                        <div className="flex flex-col gap-2">
+                            <Textarea 
+                                placeholder="E.g. Add a logout button, change colors to blue, etc." 
+                                className="w-full h-24 text-black" 
+                                value={userInput}
+                                onChange={(e) => setUserInput(e.target.value)}
+                                disabled={loading}
+                            />
+                            <Button size={'sm'} className="w-full"
+                            onClick={() => regerateScreen()}
+                            disabled={loading}
+                            > 
+                                {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkle className="w-4 h-4 mr-2" />}
+                                {loading ? "Regenerating..." : "Regenerate"}
+                            </Button>
+                        </div>
+                    </PopoverContent>
+                    </Popover>
+
                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onDeleteScreen()}>
                     <Trash2 className="w-4 h-4 text-black" />
                 </Button>
@@ -80,6 +141,7 @@ const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenNa
                         <Code className="h-4 w-4 text-black" />
                     </Button>
                 </DialogTrigger>
+                </div>
                 <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
                     <DialogHeader>
                         <DialogTitle>Exported Code</DialogTitle>

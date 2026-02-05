@@ -8,12 +8,12 @@ export async function DELETE(request: NextRequest) {
     try {
         const body = await request.json();
         console.log("Received request body:", JSON.stringify(body, null, 2));
-        const { screenName, projectId } = body;
+        const { screenId, projectId } = body;
 
-        console.log(`Deleting screen with name: ${screenName} from project: ${projectId}`);
+        console.log(`Deleting screen with id: ${screenId} from project: ${projectId}`);
 
         // Add logic to delete the screen from the database
-        await db.delete(ScreenConfig).where(and(eq(ScreenConfig.screenName, screenName), eq(ScreenConfig.projectId, projectId)));
+        await db.delete(ScreenConfig).where(and(eq(ScreenConfig.id, screenId), eq(ScreenConfig.projectId, projectId)));
 
         console.log("Screen deleted successfully");
 
