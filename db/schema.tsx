@@ -48,9 +48,8 @@ export const verification = pgTable("verification", {
 
 export const project = pgTable("project", {
   id: text("id").primaryKey(),
-  projectId: varchar().notNull(),
   projectName: varchar(),
-  description: varchar(),
+  projectDescription: varchar(),
   theme: varchar(),
   userInput: varchar(),
   device: varchar(),
@@ -98,8 +97,8 @@ export const theme = pgTable("theme", {
 
 export const ScreenConfig = pgTable("screenConfig", {
   id: text("id").primaryKey(),
-  projectId: varchar("projectId").notNull().references(() => project.projectId),
-  screenId: varchar("screenId"),
+  projectId: text("projectId").notNull().references(() => project.id),
+  screenName: varchar("screenName"),
   purpose: varchar("purpose"),
   screenDescription: varchar("screenDescription"),
   designIntent: json("designIntent"),

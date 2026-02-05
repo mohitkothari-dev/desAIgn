@@ -23,7 +23,7 @@ export async function updateProjectThemeAction(projectId: string, themeId: strin
                 theme: themeId,
                 updatedAt: new Date()
             })
-            .where(eq(project.projectId, projectId));
+            .where(eq(project.id, projectId));
 
         // Update all screen configs with new designIntent
         // We do this in parallel for performance

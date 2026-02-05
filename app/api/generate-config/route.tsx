@@ -45,7 +45,7 @@ Remember to return ONLY valid JSON matching the specified structure.
         const screenInserts = object.screens?.map((screen: any) => ({
             id: crypto.randomUUID(),
             projectId: projectId,
-            screenId: screen.id || "",
+            screenName: screen.name || "",
             purpose: screen.purpose || "",
             screenDescription: screen.name || "",
             designIntent: { 
@@ -56,14 +56,14 @@ Remember to return ONLY valid JSON matching the specified structure.
             updatedAt: new Date(),
         })) || [];
 
-        const result = await db.insert(ScreenConfig).values(screenInserts).returning({ screenId: ScreenConfig.screenId });
+        const result = await db.insert(ScreenConfig).values(screenInserts).returning({ screenName: ScreenConfig.screenName });
 
         //update project table with project Name
         await db.update(project).set({
             projectName: object.projectName,
-            description: object.description,
+            projectDescription: object.projectDescription,  
             updatedAt: new Date(),
-        }).where(eq(project.projectId, projectId));
+        }).where(eq(project.id, projectId));
 
         return NextResponse.json(object);
     } catch (error: any) {

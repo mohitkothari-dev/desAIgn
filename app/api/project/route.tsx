@@ -6,7 +6,7 @@ import { project, ScreenConfig } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
-    const { userInput, device, projectId, projectName } = await req.json();
+    const { userInput, device, id, projectName } = await req.json();
     
     //get currently logged in user
     const session = await auth.api.getSession({
@@ -19,17 +19,16 @@ export async function POST(req: NextRequest) {
 
     const { user } = session;
     const result = await db.insert(project).values({
-        id: crypto.randomUUID(),
-        projectId: projectId,
+        id: id || crypto.randomUUID(),
         userInput: userInput,
         device: device,
         userId: user.id as string,
         projectName: projectName,
         createdAt: new Date(),
         updatedAt: new Date(),
-    }).returning({ projectId: project.projectId });
+    }).returning({ id: project.id });
     
-    return NextResponse.json({ projectId: result[0] });
+    return NextResponse.json({ project: result[0] });
 }
 
 export async function GET(req: NextRequest) {
@@ -53,7 +52,7 @@ export async function GET(req: NextRequest) {
             const result = await db.select().from(project).where(
                 and(
                     eq(project.userId, user.id as string), 
-                    eq(project.projectId, projectId as string)
+                    eq(project.id, projectId as string)
                 )
             );
             console.log(`Project search result: ${result.length} found`);
