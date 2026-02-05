@@ -1,5 +1,5 @@
 import React from "react"
-import { GripVertical, Code, Copy, Check } from "lucide-react"
+import { GripVertical, Code, Copy, Check, Trash2 } from "lucide-react"
 import { Rnd } from "react-rnd"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -8,8 +8,12 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import ScreenRenderer from "./screen-renderer"
 import { generateReactCode } from "./code-generator"
 
-const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig}: {x: number, y: number, width: number, height: number, setPanningEnabled: (enabled: boolean) => void, uiConfig: any}) => {
+import { useProjectContext } from "../project-context"
+import { toast } from "sonner"
+
+const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenName, projectId}: {x: number, y: number, width: number, height: number, setPanningEnabled: (enabled: boolean) => void, uiConfig: any, screenName: string, projectId: string}) => {
   const [copied, setCopied] = React.useState(false);
+  const { refreshData } = useProjectContext();
   const code =  React.useMemo(() => generateReactCode(uiConfig), [uiConfig]);
 
   const copyToClipboard = () => {
@@ -17,7 +21,26 @@ const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig}: {x: num
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
   };
-
+  
+  const onDeleteScreen = async () => {
+    const loadingToast = toast.loading("Deleting screen...");
+    try {
+        const response = await fetch("/api/delete-screen", {
+            method: "DELETE",
+            body: JSON.stringify({ screenName, projectId }),
+        });
+        if (response.ok) {
+            toast.success("Screen deleted successfully", { id: loadingToast });
+            refreshData();
+        } else {
+            toast.error("Failed to delete screen", { id: loadingToast });
+        }
+    } catch (error) {
+        console.error("Error deleting screen:", error);
+        toast.error("Error deleting screen", { id: loadingToast });
+    }
+  }
+  
   return (
     <Rnd
     default={{
@@ -44,14 +67,17 @@ const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig}: {x: num
     >
         <div className="drag-handle cursor-move p-2 flex justify-between items-center bg-gray-100 border-b rounded-t-xl">
             <div className="flex gap-2 items-center">
-                <GripVertical className="w-4 h-4 text-gray-500" /> 
-                <span className="text-xs font-medium text-gray-600">Screen</span>
+                <GripVertical className="w-4 h-4 text-black" /> 
+                <span className="text-xs font-medium text-black">{screenName}</span>
             </div>
             
             <Dialog>
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onDeleteScreen()}>
+                    <Trash2 className="w-4 h-4 text-black" />
+                </Button>
                 <DialogTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-6 w-6">
-                        <Code className="h-4 w-4 text-gray-500" />
+                        <Code className="h-4 w-4 text-black" />
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">

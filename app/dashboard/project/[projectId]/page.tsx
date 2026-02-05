@@ -15,7 +15,7 @@ const ProjectCanvasPlayground = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
-    if (project?.projectId && screenConfigs && screenConfigs.length === 0 && !isGenerating) {
+    if (project?.id && screenConfigs && screenConfigs.length === 0 && !isGenerating) {
       generateScreenConfig();
     }
   }, [project, screenConfigs]);
@@ -35,7 +35,7 @@ const ProjectCanvasPlayground = () => {
         body: JSON.stringify({
             userInput: project.userInput,
             device: project.device,
-            projectId: project.projectId,
+            projectId: project.id,
         }),
         });
 

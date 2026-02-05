@@ -66,15 +66,17 @@ const canvas = ({ projectDetail, screenConfig, loading }: { projectDetail: Proje
                         }}
                     >
                         {screenConfig.map((screen, index) => (
-                            <ScreenFrame key={index} 
-                            x={index * (SCREEN_WIDTH + GAP) + 100} // Matches padding
-                            y={100} // Matches padding
-                            width={SCREEN_WIDTH}
-                            height={SCREEN_HEIGHT}
-                            setPanningEnabled={setPanningEnabled}
-                            uiConfig={screen.designIntent}
-                            />
-                        ))}
+                             <ScreenFrame key={index} 
+                             x={index * (SCREEN_WIDTH + GAP) + 100} // Matches padding
+                             y={100} // Matches padding
+                             width={SCREEN_WIDTH}
+                             height={SCREEN_HEIGHT}
+                             setPanningEnabled={setPanningEnabled}
+                             uiConfig={screen.designIntent}
+                             screenName={screen.screenName}
+                             projectId={projectDetail.id}
+                             />
+                         ))}
                     </div>
                 </TransformComponent>
             </>

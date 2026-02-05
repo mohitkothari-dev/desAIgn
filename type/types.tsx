@@ -2,7 +2,6 @@ export type DeviceType = "mobile" | "website";
 
 export type ProjectType = {
     id: string;
-    projectId: string;
     userInput: string;
     device: DeviceType;
     userId: string;
@@ -15,7 +14,6 @@ export type ProjectType = {
 export type ScreenConfigType = {
     id: string;
     projectId: string;
-    screenId: string;
     screenName: string;
     purpose: string;
     screenDescription: string;

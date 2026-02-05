@@ -50,11 +50,11 @@ export function ProjectProvider({
     }, []);
 
     const refreshData = async () => {
-        if (!project?.projectId) return;
+        if (!project?.id) return;
         
         setIsLoading(true);
         try {
-            const result = await fetch(`/api/project?projectId=${project.projectId}`);
+            const result = await fetch(`/api/project?projectId=${project.id}`);
             const data = await result.json();
             setProject(data.project);
             setScreenConfigs(data.screenConfig);
@@ -111,7 +111,7 @@ export function ProjectProvider({
 
         // 2. Server Action
         try {
-            const result = await updateProjectThemeAction(project.projectId, themeId, updatedConfigs);
+            const result = await updateProjectThemeAction(project.id, themeId, updatedConfigs);
             if (!result.success) {
                 throw new Error(result.error);
             }

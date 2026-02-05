@@ -42,7 +42,7 @@ export default async function ProjectLayout({
       return redirect("/sign-in");
   }
 
-  const [projectData] = await db.select().from(project).where(eq(project.projectId, projectId));
+  const [projectData] = await db.select().from(project).where(eq(project.id, projectId));
   const screenConfigs = await db.select().from(ScreenConfig).where(eq(ScreenConfig.projectId, projectId));
 
   if (!projectData) {
@@ -52,7 +52,7 @@ export default async function ProjectLayout({
   return (
     <ProjectProvider initialProject={projectData as any} initialScreenConfigs={screenConfigs as any}>
         <SidebarProvider>
-          <AppSidebar project={projectData} user={session.user} />
+          <AppSidebar project={{ ...projectData, projectId: projectData.id }} user={session.user} />
           <SidebarInset>
             <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
               <SidebarTrigger className="-ml-1" />

@@ -79,14 +79,14 @@ const Hero = () => {
       body: JSON.stringify({
         userInput: promptText,
         device: device,
-        projectId: crypto.randomUUID(), 
+        id: crypto.randomUUID(), 
         projectName: "Untitled Project", 
       }),
     });
     const data = await result.json();
     console.log(data);
 
-    router.push(`/dashboard/project/${data.projectId.projectId}`);
+    router.push(`/dashboard/project/${data.project.id}`);
   }
 
   return (
@@ -152,7 +152,7 @@ const Hero = () => {
                     {recentProjects.map((project) => (
                       <Link 
                         key={project.id} 
-                        href={`/dashboard/project/${project.projectId}`}
+                        href={`/dashboard/project/${project.id}`}
                         className="group flex flex-col p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-sm transition-all"
                       >
                         <div className="flex items-start justify-between mb-2">
