@@ -1,43 +1,78 @@
-# Architecture Flow:
+# Technical Documentation: desAIgn Architecture
 
-1. User inputs → "Make it more vibrant"
-2. AI processes → Updates ```designIntent``` JSON (changes color values, etc.)
-3. State updates → React re-renders components visually
+`#Architecture` `#NextJS15` `#GenerativeAI` `#DesignIntent` `#TokenOptimization`
 
----
-The current approach is significantly more <span style="color: #00F260">**token-efficient**</span> and architecturally robust than asking the AI to generate raw React/HTML code.
-
-Here is why this "Design Intent" approach saves tokens and improves your app:
-
-1. **Data Density (Conciseness):**
-Generating a structured JSON like ```{"type": "Button", "content": "Save"}``` is much "**cheaper**" in terms of tokens than generating a full React component:
-
-2. **No Boilerplate:** Avoided repeating ```import...```, ```export default function...```, ```return (...)```, and complex JSX syntax for every single screen.
-
-3. **Property Mapping:** AI only needs to output the values for styles and layout, while ```ScreenRenderer```
- handles the logic of how to apply them.
-
-4. **Predictability & Consistency:** AI often hallucinates or makes syntax errors when generating long blocks of code. By forcing it to output a strict JSON schema:
-    - **Lower Error Rate:** The AI is much better at maintaining a valid JSON structure than it is at writing bug-free TypeScript for 5 different screens at once.
-    - **Tokens Saved on Retries:** You spend fewer tokens because you don't have to keep re-prompting the AI to *<span style="color: #CB356B">"fix the syntax error"</span>* it made in the generated code.
-
-5. **Client-Side Flexibility (The Big Win)** Because we have the Design Intent (the "recipe") rather than the finished the code (the "dish"):
-    - **Instant Theme Swapping:** The app changes the primary color of every screen instantly on the client side just by updating the CSS variables in the renderer. Users don't need to ask the AI to re-generate the code just to change a hex value.
-    - **Component Upgrades:** If developer of this app decide tomorrow to use Shadcn UI buttons instead of standard HTML buttons, they only change the code in one place (the ```ScreenRenderer```). If they had generated raw code, they would have to re-generate every single screen to update the components.
-6. **Interactive Tokens:** The AI can effectively "summarize" a complex layout in JSON. For example, a 12-column grid system is just a few keys in JSON ```(gridConfig: { templateColumns: "repeat(12, 1fr)" }),```whereas the equivalent CSS and JSX boilerplate would be many more characters.
-
-**Summary:** This app essentially sending the "Blueprint" (tokens used for data) and letting the local CPU do the "Construction" (rendering), which is the standard professional way to build AI-driven design tools.
+This document provides a deep dive into the technical architecture, design philosophy, and implementation details of **desAIgn**.
 
 ---
-The ```code-generator.ts``` is a deterministic <mark style="background-color: #11998e; color: white; box-shadow: 2px 2px 5px rgba(255, 255, 255, 0.4);">**client-side**</mark> utility, not an LLM call. It costs <span style="color: #00F260">**zero tokens**</span> to click that button because it simply transforms the JSON that already exists into a string format. That mwans
-the current "Code Export" feature uses ZERO tokens.
 
-Here is how it works under the hood:
+## 🏗️ Core Architecture: The "Design Intent" Paradigm
 
-1. **(AI / Costly):** user type a prompt. The LLM generates the designIntent JSON. (Tokens used here).
-2. **(Renderer / Free):** The ```ScreenRenderer``` reads that JSON and displays the UI.
-3. **(Export / Free):** When user click the button, the 
-```code-generator.ts``` script simply takes that existing JSON and mathematically converts it into a string.
-    - It loops through the JSON type: "Hero" -> converts it to text ```<div className='hero'>...```.
-    - This happens 100% in the browser (Client Side).
-    - No API call is made. No data is sent to OpenAI/Gemini. It is instant and free.
+`#Strategy` `#Efficiency`
+
+Unlike traditional AI website builders that ask an LLM to generate raw HTML/JSX code directly, **desAIgn** uses a **Design Intent** abstraction layer.
+
+### 1. The Design Intent Flow
+1. **Input Phase:** User provides a natural language prompt (e.g., *"Build a landing page for a coffee shop with a dark theme"*).
+2. **Intelligence Phase:** The Google Gemini LLM processes the prompt and outputs a structured **Design Intent JSON**.
+3. **Rendering Phase:** The `ScreenRenderer` (Client-side) interprets the JSON and maps it to pre-defined React components.
+4. **Export Phase:** The `code-generator.ts` utility converts the JSON into a standalone Next.js/Tailwind component.
+
+### 2. Why Design Intent?
+- **Data Density:** A JSON object like `{"type": "Hero", "title": "Coffee"}` is significantly smaller than the equivalent JSX code, saving **60-80% in token costs**.
+- **Predictability:** JSON schemas are easier for LLMs to follow than complex programming syntax, leading to a **lower hallucination rate**.
+- **The "Blueprint" Advantage:** We separate the *content* (JSON) from the *presentation* (Renderer). This allows for instant theme swapping without calling the AI again.
+
+---
+
+## 🛠️ Tech Stack & Implementation
+
+`#Stack` `#Engineering`
+
+### Frontend & Rendering
+- **Framework:** Next.js 15 (App Router) for optimized routing and server-side rendering.
+- **Styling:** **Tailwind CSS 4.0** utilizing CSS-variable-based theming.
+- **Visuals:** Lucide React for icons and Radix UI for accessible primitive components.
+
+### AI Integration
+- **Engine:** `gemini-3-flash-preview` via the **Vercel AI SDK**.
+- **Prompt Engineering:** Systematic prompts that enforce strict JSON output according to a defined schema.
+
+### Data & Persistence
+- **ORM:** **Drizzle ORM** for type-safe database interactions.
+- **Database:** Neon PostgreSQL (Serverless).
+- **Authentication:** **Better Auth** handling multi-provider logins (Google, GitHub) and session management.
+
+---
+
+## 📊 Database Schema Overview
+
+`#Database` `#Drizzle`
+
+The application uses a relational schema designed for scalability:
+
+- **`user` / `session` / `account`:** Core authentication tables managed by Better Auth.
+- **`project`:** Stores high-level project metadata (name, description, global theme, device target).
+- **`screenConfig`:** The heart of the design, storing the `designIntent` JSON for each screen.
+- **`theme`:** Stores color palettes and radius settings as JSON objects for instant client-side injection.
+- **`shareLink`:** Manages public sharing tokens for project collaboration.
+
+---
+
+## ⚡ Zero-Token Code Generation
+
+`#ClientSide` `#ZeroCost`
+
+The code export feature is a **deterministic client-side utility**. 
+
+- **How it works:** When a user clicks "Export Code," `code-generator.ts` iterates through the `designIntent` JSON and transforms each node into a string of JSX with Tailwind classes.
+- **Performance:** This process happens entirely in the user's browser (Client Side). It is instant, requires no API calls, and costs **zero tokens**.
+
+---
+
+## 🔐 Security & Sharing
+
+`#Security` `#Auth`
+
+- **Better Auth:** Provides secure, production-ready authentication.
+- **Public Sharing:** Projects can be shared via unique, non-guessable tokens stored in the `shareLink` table, allowing for read-only preview modes.
