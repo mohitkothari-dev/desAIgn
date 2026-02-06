@@ -18,7 +18,7 @@ import { useProjectContext } from "../project-context"
 import { toast } from "sonner"
 import { Textarea } from "@/components/ui/textarea"
 
-const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenName, projectId, screenId}: {x: number, y: number, width: number, height: number, setPanningEnabled: (enabled: boolean) => void, uiConfig: any, screenName: string, projectId: string, screenId: string}) => {
+const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenName, projectId, screenId, isReadOnly = false}: {x: number, y: number, width: number, height: number, setPanningEnabled: (enabled: boolean) => void, uiConfig: any, screenName: string, projectId: string, screenId: string, isReadOnly?: boolean}) => {
   const [copied, setCopied] = React.useState(false);
   const [userInput, setUserInput] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -83,8 +83,8 @@ const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenNa
         width: width,
         height: height,
     }}
-    dragHandleClassName="drag-handle"
-    enableResizing={{
+    disableDragging={isReadOnly}
+    enableResizing={isReadOnly ? false : {
         bottom: true,
         bottomLeft: true,
         bottomRight: true,
@@ -94,6 +94,7 @@ const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenNa
         topLeft: true,
         topRight: true,
     }}
+    dragHandleClassName="drag-handle"
     onDragStart={() => setPanningEnabled(false)}
     onDragStop={() => setPanningEnabled(true)}
     onResizeStart={() => setPanningEnabled(false)}
@@ -107,35 +108,39 @@ const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenNa
             
             <Dialog>
                 <div className="flex flex-row gap-1">
-                    <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-                    <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-6 w-6">
-                        <Sparkle className="w-4 h-4 text-black" />
-                    </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80">
-                        <div className="flex flex-col gap-2">
-                            <Textarea 
-                                placeholder="E.g. Add a logout button, change colors to blue, etc." 
-                                className="w-full h-24" 
-                                value={userInput}
-                                onChange={(e) => setUserInput(e.target.value)}
-                                disabled={loading}
-                            />
-                            <Button size={'sm'} className="w-full"
-                            onClick={() => regerateScreen()}
-                            disabled={loading}
-                            > 
-                                {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkle className="w-4 h-4 mr-2" />}
-                                {loading ? "Regenerating..." : "Regenerate"}
-                            </Button>
-                        </div>
-                    </PopoverContent>
-                    </Popover>
+                    {!isReadOnly && (
+                        <>
+                            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                                <PopoverTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-6 w-6">
+                                        <Sparkle className="w-4 h-4 text-black" />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80">
+                                    <div className="flex flex-col gap-2">
+                                        <Textarea 
+                                            placeholder="E.g. Add a logout button, change colors to blue, etc." 
+                                            className="w-full h-24" 
+                                            value={userInput}
+                                            onChange={(e) => setUserInput(e.target.value)}
+                                            disabled={loading}
+                                        />
+                                        <Button size={'sm'} className="w-full"
+                                        onClick={() => regerateScreen()}
+                                        disabled={loading}
+                                        > 
+                                            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkle className="w-4 h-4 mr-2" />}
+                                            {loading ? "Regenerating..." : "Regenerate"}
+                                        </Button>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
 
-                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onDeleteScreen()}>
-                    <Trash2 className="w-4 h-4 text-black" />
-                </Button>
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onDeleteScreen()}>
+                                <Trash2 className="w-4 h-4 text-black" />
+                            </Button>
+                        </>
+                    )}
                 <DialogTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-6 w-6">
                         <Code className="h-4 w-4 text-black" />
