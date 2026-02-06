@@ -105,3 +105,13 @@ export const ScreenConfig = pgTable("screenConfig", {
   createdAt: timestamp("createdAt").notNull(),
   updatedAt: timestamp("updatedAt").notNull(),
 })
+
+export const ShareLink = pgTable("shareLink", {
+  id: text("id").primaryKey(),
+  projectId: text("projectId").notNull().references(() => project.id),
+  shareToken: text("shareToken").notNull().unique(),
+  expiresAt: timestamp("expiresAt"),
+  isActive: boolean("isActive").notNull().default(true),
+  createdAt: timestamp("createdAt").notNull(),
+  updatedAt: timestamp("updatedAt").notNull(),
+})

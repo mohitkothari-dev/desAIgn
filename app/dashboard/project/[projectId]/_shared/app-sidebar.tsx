@@ -33,7 +33,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { ThemeColors } from "@/lib/themes"
-import { toast } from "sonner"; 
+import { toast } from "sonner";
+import { ShareDialog } from "./share-dialog"; 
 
 type Theme = {
     id: string;
@@ -381,16 +382,14 @@ export function AppSidebar({ project, user, ...props }: AppSidebarProps) {
                         </div>
                         <Separator className="mt-6 bg-foreground" />
                         <div className="mt-2">
-                            <h2>Export Options</h2>
-                            <div className="flex gap-3">
-                                <Button className="mt-2" onClick={handleScreenshot}>
-                                    <Camera /> Screenshot
-                                </Button>                         
-                                <Button className="mt-2">
-                                    <Share /> Share
-                                </Button>
+                                <h2>Export Options</h2>
+                                <div className="flex gap-3">
+                                    <Button className="mt-2" onClick={handleScreenshot}>
+                                        <Camera /> Screenshot
+                                    </Button>                         
+                                    <ShareDialog projectId={project.projectId} />
+                                </div>
                             </div>
-                        </div>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
