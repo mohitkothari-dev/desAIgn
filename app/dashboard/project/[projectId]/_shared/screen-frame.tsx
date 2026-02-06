@@ -117,7 +117,7 @@ const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenNa
                         <div className="flex flex-col gap-2">
                             <Textarea 
                                 placeholder="E.g. Add a logout button, change colors to blue, etc." 
-                                className="w-full h-24 text-black" 
+                                className="w-full h-24" 
                                 value={userInput}
                                 onChange={(e) => setUserInput(e.target.value)}
                                 disabled={loading}

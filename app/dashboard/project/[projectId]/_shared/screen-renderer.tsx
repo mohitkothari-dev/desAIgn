@@ -408,6 +408,11 @@ const VisualComponent = ({ component }: { component: ComponentProps }) => {
 
 const ScreenRenderer = ({ designIntent, screenId }: { designIntent: any, screenId?: string }) => {
   if (!designIntent) return null;
+  
+  // Check if screens array exists and is not empty
+  if (!designIntent.screens || !Array.isArray(designIntent.screens) || designIntent.screens.length === 0) {
+    return <div className="p-4 text-red-500">No screens available in design intent</div>;
+  }
 
   const screen = screenId 
     ? designIntent.screens.find((s: any) => s.id === screenId)
