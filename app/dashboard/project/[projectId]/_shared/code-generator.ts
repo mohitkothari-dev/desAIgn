@@ -149,7 +149,10 @@ import * as LucideIcons from "lucide-react";
 export default function ${componentName}() {
   return (
     <div className="w-full min-h-screen bg-background text-foreground font-sans">
-${screen.children.map((c: any) => renderComponent(c, 6)).join('\n')}
+${Array.isArray(screen.children) ? screen.children.map((c: any) => renderComponent(c, 6)).join('\n') : 
+'      <div className="flex flex-col items-center justify-center min-h-screen p-8">\n' +
+'        <div className="text-2xl font-bold text-gray-600">Screen content will appear here</div>\n' +
+'      </div>'}
     </div>
   );
 }
