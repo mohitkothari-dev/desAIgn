@@ -5,7 +5,8 @@ import {
   Sparkle,
   Share,
   Plus,
-  Camera
+  Camera,
+  Loader2
 } from "lucide-react"
 
 import {
@@ -60,10 +61,12 @@ type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
 }
 
 import { useProjectContext } from "../project-context";
+import { usePathname } from "next/navigation";
 
 export function AppSidebar({ project, user, ...props }: AppSidebarProps) {
     const router = useRouter();
-    const { themes: contextThemes, updateTheme, project: contextProject } = useProjectContext();
+    const pathname = usePathname();
+    const { themes: contextThemes, updateTheme, project: contextProject, refreshData } = useProjectContext();
 
     // Use context themes if available, otherwise empty (though context should ideally load them)
     // We keep local state for "themes" to support the optimistic update from "create" if we want, 
@@ -76,7 +79,7 @@ export function AppSidebar({ project, user, ...props }: AppSidebarProps) {
     
     const [projectName, setProjectName] = React.useState<string>('');
     const [userNewScreenInput, setUserNewScreenInput] = React.useState<string>('');
-    // const [isLoading, setIsLoading] = React.useState(true); // Handled by context
+    const [loadingNewScreen, setLoadingNewScreen] = React.useState(false);
     const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [isCreating, setIsCreating] = React.useState(false);
 
@@ -185,14 +188,67 @@ export function AppSidebar({ project, user, ...props }: AppSidebarProps) {
         }
     };
 
+
+    const generateNewScreen = async () => {
+        if (!userNewScreenInput.trim()) {
+            alert('Please enter a screen description');
+            return;
+        }
+        setLoadingNewScreen(true);
+        try {
+            const response = await fetch('/api/generate-new-screen', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userInput: userNewScreenInput,
+                    device: 'mobile',
+                    projectId: project.projectId,
+                })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                toast.success("Screen generated successfully!");
+                setUserNewScreenInput(''); // Clear input field
+                // Refresh project data to show the new screen
+                await refreshData();
+            } else {
+                toast.error("Failed to generate screen: " + data.error);
+            }
+        } catch (error) {
+            console.error("Error generating screen:", error);
+            toast.error("An error occurred while generating the screen.");
+        } finally {
+            setLoadingNewScreen(false);
+        }
+    };
+
     return (
         <Sidebar variant="inset" {...props} className="mt-16">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <Textarea placeholder="Generate a new screen / page..." onChange={(e) => setUserNewScreenInput(e.target.value)} />
-                        <Button className="w-full mt-2">
-                            <Sparkle /> Generate with AI
+                        <Textarea 
+                            placeholder="Generate a new screen / page..." 
+                            onChange={(e) => setUserNewScreenInput(e.target.value)}
+                            value={userNewScreenInput}
+                            disabled={loadingNewScreen}
+                            className={loadingNewScreen ? "opacity-50 cursor-not-allowed" : ""}
+                        />
+                        <Button className="w-full mt-2" onClick={generateNewScreen} disabled={loadingNewScreen || !userNewScreenInput.trim()}>
+                            {loadingNewScreen ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                    Generating...
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkle className="h-4 w-4 mr-2" /> 
+                                    Generate Screen
+                                </>
+                            )}
                         </Button>
 
                         <Separator className="my-2 bg-foreground" />

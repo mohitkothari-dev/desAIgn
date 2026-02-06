@@ -1,5 +1,10 @@
 export const generateReactCode = (designIntent: any, screenId?: string) => {
   if (!designIntent) return '// No design intent provided';
+  
+  // Check if screens array exists and is not empty
+  if (!designIntent.screens || !Array.isArray(designIntent.screens) || designIntent.screens.length === 0) {
+    return '// No screens available in design intent';
+  }
 
   const screen = screenId 
     ? designIntent.screens.find((s: any) => s.id === screenId)
