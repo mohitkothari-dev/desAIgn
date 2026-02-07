@@ -21,7 +21,7 @@ Unlike traditional AI website builders that ask an LLM to generate raw HTML/JSX 
 ### 2. Why Design Intent?
 - **Data Density:** A JSON object like `{"type": "Hero", "title": "Coffee"}` is significantly smaller than the equivalent JSX code, saving **60-80% in token costs**.
 - **Predictability:** JSON schemas are easier for LLMs to follow than complex programming syntax, leading to a **lower hallucination rate**.
-- **The "Blueprint" Advantage:** We separate the *content* (JSON) from the *presentation* (Renderer). This allows for instant theme swapping without calling the AI again.
+- **The "Blueprint" Advantage:** I have separated the *content* (JSON) from the *presentation* (Renderer). This allows for instant theme swapping without calling the AI again.
 
 ---
 
