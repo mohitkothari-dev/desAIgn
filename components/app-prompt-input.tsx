@@ -44,8 +44,8 @@ import { DeviceType } from "@/type/types";
 
 const models = [
   {
-    id: "gemini-2.0-flash-exp",
-    name: "Gemini 2.0 Flash",
+    id: "gemini-3.0-flash-exp",
+    name: "Gemini 3 Flash",
     chef: "Google",
     chefSlug: "google",
     providers: ["google"],
