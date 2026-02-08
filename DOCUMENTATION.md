@@ -8,21 +8,36 @@ This document provides a deep dive into the technical architecture, design philo
 
 ## 💡 Core Idea:
 
-The idea behind building this app is to <font color="#43e97b" style="font-weight: bold; font-size: 1.2rem; font-style: italic;">invent a super cost-efficient way of designing websites using AI!</font> We already have <a href="https://www.figma.com/">Figma</a> for killer mockups, no-code champs like <a href="https://www.framer.com/">Framer</a> and <a href="https://webflow.com/">Webflow</a>, and AI website builders like <a href="https://bolt.new/">bolt.new</a>, <a href="https://v0.dev/">v0.dev</a>, <a href="https://lovable.dev/">lovable.dev</a>, <a href="https://replit.com/">Replit</a>, and more. But here's the catch: they all generate code on every single user tweak, firing off pricey API calls to the LLM each time! 😩 That guzzles thousands of tokens per request, racks up costs, and sometimes spits out subpar results. 
+The idea behind building this app is to **invent a super cost-efficient way of designing websites using AI!** 🌟
 
-So, I dreamed up a game-changing approach to slash costs and save endless hours of AI tweaking slop!
-This is more of a like <a href="https://gemini.google.com/share/stitch">Google Stitch</a> or <a href="https://uxpilot.ai/">UXPilot</a>, but with a twist! 
+We already have [Figma](https://www.figma.com/) for killer mockups, no-code champs like [Framer](https://www.framer.com/) and [Webflow](https://webflow.com/), and AI website builders like [bolt.new](https://bolt.new/), [v0.dev](https://v0.dev/), [lovable.dev](https://lovable.dev/), [Replit](https://replit.com/), and more. 
+**But here's the catch:** they all generate code **on every single user tweak**, firing off pricey API calls to the LLM each time! 😩  
+That guzzles **thousands of tokens** per request, racks up costs, and sometimes spits out subpar results.
+
+So, I dreamed up a **game-changing approach** to slash costs *and save endless hours* of AI tweaking slop! 🚀
+This is more like [Google Stitch](https://gemini.google.com/share/stitch) or [UXPilot](https://uxpilot.ai/), **but with a twist!** ✨
+
 
 > *For more information related to architectural decision making, check out the [ARCHITECTURAL_DECISION.md](./ARCHITECTURAL_DECISION.md) file.*
 
-The core idea is to focus on AI generated designing <font color="#43e97b" style=" font-style: italic;">(something like Figma, but only for designing  websites and apps using AI)</font> where users spend time in finalizing the design first; once the design is finalized, then jump back to the AI website generators like Bolt, Lovable, etc., and then create the website in one-shot! Rather than spending time and money in finalizing the output from Bolt, Lovable, Replit, etc.
+**The core idea** is to focus on **AI-generated designing** _*(something like Figma, but only for designing websites and apps using AI)*_ where users spend time finalizing the design first, once the design is finalized, then jump back to AI website generators like Bolt, Lovable, etc., and create the website **in one-shot**! 🎯 rather than spending time and money finalizing the output from Bolt, Lovable, Replit, etc.
 
-In the future, the AI website generation capability will also be integrated into this application! So the flow will be: users spend quality time on finalizing the design, and then with just the push of one button, the website will be generated in one-shot <font color="#fee140" style=" font-style: italic;">(as the system will already be having enough context about the entire design flow from the user's conversation)</font>. 
+---
 
-🤔 You might be thinking, **what am I planning here?** 
-The idea here is, the design mockup will already be there after the user finishes generating and finalizing the design with all the conversation that the user had with the LLM, that will be used as 🔥**context**🔥! That's why, when the user decides to generate the proper website, the user won't have to provide the entire context again, just a push of a button will be enough to generate the website!
+**In the future**, the AI website generation capability will also be integrated into this application! 🚀 
 
-And that's not all, this app also rocks inline and in-app editing features! <font color="#fee140" style=" font-style: italic;">More in-app editing features will be added in the future!</font> 
+**The flow**: Users spend quality time finalizing the design, then with just the push of **one button**, the website generates **in one-shot** _*(system already has full design context from conversation) 💛*_.
+
+---
+
+🤔 **You might be thinking, "What am I planning here?"**
+
+The design mockup will already exist after users finish generating and finalizing with the LLM,all that conversation becomes **🔥 context**! 🔥 That's why when users want the proper website, **no re-explaining needed**,just **one button push** generates it instantly! 
+
+---
+
+**And that's not all**—this app rocks **inline and in-app editing features**! _*More in-app editing coming soon!* 💛_
+
 
 For quick tweaks like swapping background colors, fonts, or button styles, developers can code away, but non-developers usually ask the LLM to do it for them, and for such use cases, this in-app editing feature will be helpful a lot! 😎
 
