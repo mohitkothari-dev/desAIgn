@@ -5,6 +5,7 @@ import { eq, and } from "drizzle-orm";
 import { generateText } from "ai";
 import { activeGeminiModel } from "@/lib/gemini";
 import { MOBILE_DESIGN_PROMPT, WEBSITE_DESIGN_PROMPT } from "@/lib/prompt";
+import { parseAIJsonResponse } from "@/lib/utils";
 
 export async function POST(req: NextRequest) {
     try {
@@ -149,15 +150,7 @@ INSTRUCTIONS:
         });
 
         // 5. Parse and clean the response
-        const jsonString = text.replace(/```json/g, "").replace(/```/g, "").trim();
-        let regeneratedObject;
-        
-        try {
-            regeneratedObject = JSON.parse(jsonString);
-        } catch (parseError) {
-            console.error("Failed to parse AI response:", jsonString);
-            throw new Error("Invalid JSON response from AI");
-        }
+        const regeneratedObject = parseAIJsonResponse(text);
 
         // Validate and ensure proper structure
         if (!regeneratedObject.screens || !Array.isArray(regeneratedObject.screens)) {
