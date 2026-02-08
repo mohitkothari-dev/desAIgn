@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Elms_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from '@vercel/analytics/next';
 
 const elmsSans = Elms_Sans({
   subsets: ["latin"],
