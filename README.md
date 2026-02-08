@@ -1,9 +1,14 @@
 # desAIgn - AI-Powered Design Tool
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Vercel ai sdk](https://img.shields.io/badge/Vercel_ai_sdk-3.0.13-black?style=for-the-badge&logo=vercel)](https://sdk.vercel.ai/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-845ec2?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 [![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-0.45-C5F74F?style=for-the-badge&logo=drizzle)](https://orm.drizzle.team/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-0081cf?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![Gemini AI](https://img.shields.io/badge/Gemini_AI-Google-4285F4?style=for-the-badge&logo=google-gemini)](https://ai.google.dev/)
+[![Better Auth](https://img.shields.io/badge/Better_Auth-1.4.14-black?style=for-the-badge&logo=better-auth)](https://better-auth.com/)
+
+
 
 **desAIgn** is a high-performance AI designer that allows you to create websites, apps, and prototypes using natural language. Instead of generating raw code directly, it uses a unique **Design Intent** architecture that is token-efficient, predictable, and incredibly fast.
 
