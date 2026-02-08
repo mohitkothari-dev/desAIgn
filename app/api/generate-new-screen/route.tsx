@@ -5,6 +5,7 @@ import { GENERATE_NEW_SCREEN_IN_EXISTING_PROJECT_PROMPT } from "@/lib/prompt";
 import { db } from "@/db";
 import { ScreenConfig, project } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { parseAIJsonResponse } from "@/lib/utils";
 
 export async function POST(request: NextRequest) {
     console.log("POST /api/generate-new-screen hit");
@@ -60,8 +61,7 @@ Generate EXACTLY ONE new screen that matches this existing project's design patt
         });
 
         // Clean up the response
-        const jsonString = text.replace(/```json/g, "").replace(/```/g, "").trim();
-        const newScreenData = JSON.parse(jsonString);
+        const newScreenData = parseAIJsonResponse(text);
 
         console.log("Generated new screen:", JSON.stringify(newScreenData, null, 2));
 

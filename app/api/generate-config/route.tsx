@@ -5,6 +5,7 @@ import { MOBILE_DESIGN_PROMPT, WEBSITE_DESIGN_PROMPT } from "@/lib/prompt";
 import { db } from "@/db";
 import { ScreenConfig, project } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { parseAIJsonResponse } from "@/lib/utils";
 
 export async function POST(request: NextRequest) {
     console.log("POST /api/generate-config hit");
@@ -35,8 +36,7 @@ Remember to return ONLY valid JSON matching the specified structure.
         });
 
         // Clean up the response in case there are markdown blocks
-        const jsonString = text.replace(/```json/g, "").replace(/```/g, "").trim();
-        const object = JSON.parse(jsonString);
+        const object = parseAIJsonResponse(text);
 
         console.log("Generated Object successfully");
         console.log("Final Generated Object:", JSON.stringify(object, null, 2));
