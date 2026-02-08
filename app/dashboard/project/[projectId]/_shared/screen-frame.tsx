@@ -164,7 +164,7 @@ const ScreenFrame = ({x, y, width, height, setPanningEnabled, uiConfig, screenNa
                 </DialogContent>
             </Dialog>
         </div>
-        <div className="w-full h-[calc(100%-40px)] bg-white rounded-b-xl shadow-lg border-x border-b border-gray-200 overflow-hidden">
+        <div className="w-full h-[calc(100%-40px)] bg-background rounded-b-xl shadow-lg border-x border-b border-border overflow-hidden">
             <ScreenRenderer designIntent={uiConfig} />
         </div>
     </Rnd>
