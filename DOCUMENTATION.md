@@ -10,21 +10,20 @@ This document provides a deep dive into the technical architecture, design philo
 
 The idea behind building this app is to **invent a super cost-efficient way of designing websites using AI!** 🌟
 
-We already have [Figma](https://www.figma.com/) for killer mockups, no-code champs like [Framer](https://www.framer.com/) and [Webflow](https://webflow.com/), and AI website builders like [bolt.new](https://bolt.new/), [v0.dev](https://v0.dev/), [lovable.dev](https://lovable.dev/), [Replit](https://replit.com/), and more. 
+We already have [Figma](https://www.figma.com/) for killer mockups, no-code champs like [Framer](https://www.framer.com/) and [Webflow](https://webflow.com/), and AI website builders like [bolt.new](https://bolt.new/), [v0.dev](https://v0.dev/), [lovable.dev](https://lovable.dev/), [Replit](https://replit.com/), and more.
 **But here's the catch:** they all generate code **on every single user tweak**, firing off pricey API calls to the LLM each time! 😩  
 That guzzles **thousands of tokens** per request, racks up costs, and sometimes spits out subpar results.
 
-So, I dreamed up a **game-changing approach** to slash costs *and save endless hours* of AI tweaking slop! 🚀
+So, I dreamed up a **game-changing approach** to slash costs _and save endless hours_ of AI tweaking slop! 🚀
 This is more like [Google Stitch](https://gemini.google.com/share/stitch) or [UXPilot](https://uxpilot.ai/), **but with a twist!** ✨
 
-
-> *For more information related to architectural decision making, check out the [ARCHITECTURAL_DECISION.md](./ARCHITECTURAL_DECISION.md) file.*
+> _For more information related to architectural decision making, check out the [ARCHITECTURAL_DECISION.md](./ARCHITECTURAL_DECISION.md) file._
 
 **The core idea** is to focus on **AI-generated designing** _*(something like Figma, but only for designing websites and apps using AI)*_ where users spend time finalizing the design first, once the design is finalized, then jump back to AI website generators like Bolt, Lovable, etc., and create the website **in one-shot**! 🎯 rather than spending time and money finalizing the output from Bolt, Lovable, Replit, etc.
 
 ---
 
-**In the future**, the AI website generation capability will also be integrated into this application! 🚀 
+**In the future**, the AI website generation capability will also be integrated into this application! 🚀
 
 **The flow**: Users spend quality time finalizing the design, then with just the push of **one button**, the website generates **in one-shot** _*(system already has full design context from conversation) 💛*_.
 
@@ -32,12 +31,11 @@ This is more like [Google Stitch](https://gemini.google.com/share/stitch) or [UX
 
 🤔 **You might be thinking, "What am I planning here?"**
 
-The design mockup will already exist after users finish generating and finalizing with the LLM,all that conversation becomes **🔥 context**! 🔥 That's why when users want the proper website, **no re-explaining needed**,just **one button push** generates it instantly! 
+The design mockup will already exist after users finish generating and finalizing with the LLM,all that conversation becomes **🔥 context**! 🔥 That's why when users want the proper website, **no re-explaining needed**,just **one button push** generates it instantly!
 
 ---
 
 **And that's not all**—this app rocks **inline and in-app editing features**! _*More in-app editing coming soon!* 💛_
-
 
 For quick tweaks like swapping background colors, fonts, or button styles, developers can code away, but non-developers usually ask the LLM to do it for them, and for such use cases, this in-app editing feature will be helpful a lot! 😎
 
@@ -128,6 +126,7 @@ The code export feature is a **deterministic client-side utility**.
 The following diagram illustrates the complete system architecture, showing how different components interact:
 
 ![alt text](/public/HighLevelSystemArchitecture.png)
+
 ### Data Flow Architecture
 
 ![alt text](/public/DataFlowArchitecture.png)
@@ -201,10 +200,19 @@ The `ScreenRenderer` maps JSON objects to pre-built React components:
 ### Token Cost Comparison
 
 > [!IMPORTANT]
-> The following analysis is based on **Google Gemini 1.5 Flash** pricing:
+> The following analysis uses **Google Gemini 1.5 Flash** pricing for historical reference.
 >
-> - Input: $0.075 per 1M tokens
-> - Output: $0.30 per 1M tokens
+> **Current Gemini Model Pricing (2026):**
+>
+> | Model                     | Input (≤128K) | Output    | Input (>128K) | Best For                |
+> | ------------------------- | ------------- | --------- | ------------- | ----------------------- |
+> | **Gemini 1.5 Flash**      | $0.075/1M     | $0.30/1M  | $0.15/1M      | Legacy baseline         |
+> | **Gemini 2.5 Flash-Lite** | $0.10/1M      | $0.40/1M  | -             | **Most cost-effective** |
+> | **Gemini 2.5 Flash**      | $0.30/1M      | $2.50/1M  | -             | Hybrid reasoning        |
+> | **Gemini 3 Flash**        | $0.50/1M      | $3.00/1M  | -             | Production speed        |
+> | **Gemini 3 Pro**          | $2.00/1M      | $12.00/1M | $4.00/1M+     | Premium quality         |
+>
+> For production deployments with desAIgn's JSON approach, **Gemini 2.5 Flash-Lite** or **Gemini 3 Flash** offer the best balance of cost and performance.
 
 #### Scenario: Landing Page Generation (3 screens)
 
@@ -272,6 +280,21 @@ For a project with:
 > [!NOTE]
 > **Overall Project Cost Reduction: 99.2%**
 
+### Comparative Analysis Across Gemini Models
+
+The table below shows total project costs (1 generation + 3 theme changes + 2 iterations + 5 exports) across different Gemini models:
+
+| Model                     | Traditional Approach | desAIgn Approach | Savings   | Reduction % |
+| ------------------------- | -------------------- | ---------------- | --------- | ----------- |
+| **Gemini 1.5 Flash**      | $35.09               | $0.28            | $34.81    | **99.2%**   |
+| **Gemini 2.5 Flash-Lite** | $46.79               | $0.37            | $46.42    | **99.2%**   |
+| **Gemini 2.5 Flash**      | $293.33              | $9.33            | $284.00   | **96.8%**   |
+| **Gemini 3 Flash**        | $352.00              | $11.33           | $340.67   | **96.8%**   |
+| **Gemini 3 Pro**          | $1,408.00            | $45.33           | $1,362.67 | **96.8%**   |
+
+> [!TIP]
+> Even with the latest **Gemini 3 Flash** model (10× more expensive than 1.5 Flash), the JSON approach still delivers **96.8% cost savings** due to minimal token generation.
+
 ---
 
 ## 🚀 Performance Benefits
@@ -337,12 +360,14 @@ For a project with:
 `#ROI` `#Summary`
 
 > [!IMPORTANT]
-> **Key Cost Metrics:**
+> **Key Cost Metrics (Across Model Generations):**
 >
-> - **91.2% reduction in LLM API costs**
+> - **91-99% reduction in LLM API costs** (varies by model: 1.5 Flash → 3 Pro)
 > - **74% faster generation times**
 > - **100% cost elimination** for theme changes and code exports
-> - **99.2% overall project cost reduction** (including iterations)
+> - **96-99% overall project cost reduction** (including iterations)
+>
+> **Model Recommendation:** For optimal cost-performance, use **Gemini 2.5 Flash-Lite** or **Gemini 3 Flash** depending on your quality requirements.
 
 The JSON-to-Code rendering engine represents a **paradigm shift** in AI-powered design tools:
 

@@ -30,27 +30,58 @@ const LucideIcon = ({ name, size = 16, className = "" }: { name: string, size?: 
 
 // --- Semantic Patterns ---
 
-const NavbarPattern = ({ styles, branding, links, actions, variant = "solid" }: any) => {
+const NavbarPattern = ({ styles, branding, links, actions, variant = "solid", _manualOverrides }: any) => {
+    const containerOverrides = _manualOverrides?.container || {};
     const isFloating = variant === "floating";
+    const isTransparent = variant === "transparent";
+    const isMinimal = variant === "minimal";
+    const isGlassmorphic = variant === "glassmorphic";
+    
+    // Determine background based on variant
+    let bgStyle = {};
+    let borderStyle = 'border-b';
+    let borderColor = 'border-border';
+    
+    if (isFloating) {
+        bgStyle = { 
+            backgroundColor: 'hsl(var(--card) / 0.8)', 
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 4px 30px hsl(var(--foreground) / 0.1)'
+        };
+        borderColor = 'border-border/50';
+    } else if (isGlassmorphic) {
+        bgStyle = {
+            background: 'linear-gradient(135deg, hsl(var(--card) / 0.7) 0%, hsl(var(--card) / 0.5) 100%)',
+            backdropFilter: 'blur(16px)',
+            borderBottom: '1px solid hsl(var(--border) / 0.3)'
+        };
+        borderStyle = '';
+    } else if (isTransparent) {
+        bgStyle = { backgroundColor: 'transparent' };
+        borderColor = 'border-transparent';
+    } else if (isMinimal) {
+        bgStyle = { backgroundColor: 'hsl(var(--background))' };
+        borderColor = 'border-border/30';
+    } else {
+        bgStyle = { backgroundColor: 'hsl(var(--card))' };
+    }
     
     return (
         <div 
             style={{ 
+                ...bgStyle,
                 ...styles, 
-                backgroundColor: isFloating ? 'rgba(255, 255, 255, 0.8)' : (styles?.backgroundColor || 'var(--card)'),
-                backdropFilter: isFloating ? 'blur(12px)' : 'none',
+                ...containerOverrides,
                 position: isFloating ? 'sticky' : 'relative',
                 top: isFloating ? 0 : 'auto',
                 zIndex: 50,
-                borderBottom: isFloating ? '1px solid rgba(0,0,0,0.1)' : '1px solid var(--border)',
-                boxShadow: isFloating ? '0 4px 30px rgba(0, 0, 0, 0.1)' : 'none',
                 width: '100%'
             }} 
-            className="flex items-center justify-between px-6 py-4 transition-all duration-300"
+            className={`flex items-center justify-between px-6 ${isMinimal ? 'py-3' : 'py-4'} transition-all duration-300 ${borderStyle} ${borderColor}`}
         >
             <div className="flex items-center gap-2">
                 {branding?.icon && <LucideIcon name={branding.icon} size={24} className="text-primary" />}
-                <span className="text-xl font-bold tracking-tight">{branding?.text || 'Brand'}</span>
+                <span className={`${isMinimal ? 'text-lg' : 'text-xl'} font-bold tracking-tight`}>{branding?.text || 'Brand'}</span>
             </div>
             
             <div className="hidden md:flex items-center gap-6">
@@ -69,16 +100,205 @@ const NavbarPattern = ({ styles, branding, links, actions, variant = "solid" }: 
                 ))}
             </div>
         </div>
-    )
+    );
 }
 
-const HeroPattern = ({ styles, headline, subheadline, cta, image, variant = "default" }: any) => {
+const HeroPattern = ({ styles, headline, subheadline, cta, image, variant = "default", styleIntensity = "standard", effects, _manualOverrides }: any) => {
+    // Apply manual overrides if present
+    const containerOverrides = _manualOverrides?.container || {};
+    const headlineOverrides = _manualOverrides?.headline || {};
+    
+    // Determine intensity-based styling
+    const intensityClasses = {
+        minimal: "py-16",
+        standard: "py-20",
+        premium: "py-24 md:py-32"
+    };
+    
+    const paddingClass = intensityClasses[styleIntensity as keyof typeof intensityClasses] || intensityClasses.standard;
+    
+    // Gradient Animated Variant
+    if (variant === "gradient-animated") {
+        return (
+            <div 
+                style={{ 
+                    ...styles, 
+                    ...containerOverrides,
+                    background: effects?.gradient === "sunset" 
+                        ? "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)"
+                        : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    position: "relative",
+                    overflow: "hidden"
+                }} 
+                className={`flex flex-col items-center text-center gap-8 px-8 ${paddingClass} w-full relative`}
+            >
+                {/* Animated background effect */}
+                <div className="absolute inset-0 opacity-30">
+                    <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+                    <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+                    <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+                </div>
+                
+                <div className="max-w-4xl space-y-6 relative z-10">
+                    <Badge variant="secondary" className="mb-2 mx-auto w-fit backdrop-blur-sm bg-white/20 text-white border-white/30">
+                        ✨ New Features
+                    </Badge>
+                    <h1 
+                        style={headlineOverrides}
+                        className="text-5xl md:text-7xl font-extrabold tracking-tight text-white drop-shadow-lg"
+                    >
+                        {headline}
+                    </h1>
+                    <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+                        {subheadline}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+                        {cta?.map((btn: any, idx: number) => (
+                            <Button 
+                                key={idx} 
+                                size="lg" 
+                                variant={btn.variant || "default"} 
+                                className="gap-2 bg-white text-purple-900 hover:bg-white/90 shadow-xl"
+                            >
+                                {btn.icon && <LucideIcon name={btn.icon} />}
+                                {btn.label}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+                
+                {image && (
+                    <div className="w-full max-w-5xl mt-8 relative z-10">
+                        <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-lg">
+                            <img 
+                                src={image.src || "/placeholder.svg"} 
+                                alt="Hero" 
+                                className="w-full h-auto object-cover max-h-[600px]" 
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+    
+    // Glassmorphic Variant
+    if (variant === "glassmorphic") {
+        return (
+            <div 
+                style={{
+                    ...styles,
+                    ...containerOverrides,
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)",
+                    backdropFilter: effects?.blur || "blur(16px)",
+                    position: "relative"
+                }}
+                className={`flex flex-col items-center text-center gap-8 px-8 ${paddingClass} w-full border border-white/20`}
+            >
+                <div className="max-w-4xl space-y-6">
+                    <Badge variant="outline" className="mb-2 mx-auto w-fit bg-white/10 backdrop-blur-md border-white/30">
+                        New Features
+                    </Badge>
+                    <h1 
+                        style={headlineOverrides}
+                        className="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600"
+                    >
+                        {headline}
+                    </h1>
+                    <p className="text-xl text-foreground/80 max-w-2xl mx-auto">
+                        {subheadline}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+                        {cta?.map((btn: any, idx: number) => (
+                            <Button 
+                                key={idx} 
+                                size="lg" 
+                                variant={btn.variant || "default"} 
+                                className="gap-2 backdrop-blur-sm bg-primary/90 hover:bg-primary shadow-lg"
+                            >
+                                {btn.icon && <LucideIcon name={btn.icon} />}
+                                {btn.label}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+                
+                {image && (
+                    <div className="w-full max-w-5xl mt-8">
+                        <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-lg bg-white/5">
+                            <img 
+                                src={image.src || "/placeholder.svg"} 
+                                alt="Hero" 
+                                className="w-full h-auto object-cover max-h-[600px]" 
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+    
+    // Split Content Variant (Default-esque but enhanced)
+    if (variant === "split-content") {
+        return (
+            <div 
+                style={{ ...styles, ...containerOverrides }} 
+                className={`flex flex-col md:flex-row items-center gap-12 px-8 ${paddingClass} w-full bg-background`}
+            >
+                <div className="flex-1 space-y-6 text-center md:text-left">
+                    <Badge variant="outline" className="mb-2">🚀 Highlighted</Badge>
+                    <h1 
+                        style={headlineOverrides}
+                        className="text-4xl md:text-6xl font-extrabold tracking-tight lg:text-7xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text"
+                    >
+                        {headline}
+                    </h1>
+                    <p className="text-xl text-muted-foreground md:w-3/4 leading-relaxed">
+                        {subheadline}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-4">
+                        {cta?.map((btn: any, idx: number) => (
+                            <Button 
+                                key={idx} 
+                                size="lg" 
+                                variant={btn.variant || "default"} 
+                                className="gap-2 h-12 px-6 shadow-md hover:shadow-lg transition-all"
+                            >
+                                {btn.icon && <LucideIcon name={btn.icon} />}
+                                {btn.label}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+                
+                {image && (
+                    <div className="flex-1 w-full max-w-xl">
+                        <div className="relative rounded-2xl overflow-hidden shadow-xl ring-1 ring-border/50 hover:shadow-2xl transition-shadow">
+                            <img 
+                                src={image.src || "/placeholder.svg"} 
+                                alt="Hero" 
+                                className="w-full h-auto object-cover aspect-video" 
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    // Centered Variant (Enhanced)
     if (variant === "centered") {
         return (
-            <div style={styles} className="flex flex-col items-center text-center gap-8 px-8 py-24 w-full bg-gradient-to-b from-background to-muted/20">
-                 <div className="max-w-4xl space-y-6">
+            <div 
+                style={{ ...styles, ...containerOverrides }} 
+                className={`flex flex-col items-center text-center gap-8 px-8 ${paddingClass} w-full bg-gradient-to-b from-background to-muted/20`}
+            >
+                <div className="max-w-4xl space-y-6">
                     <Badge variant="secondary" className="mb-2 mx-auto w-fit">New Features</Badge>
-                    <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight">
+                    <h1 
+                        style={headlineOverrides}
+                        className="text-5xl md:text-7xl font-extrabold tracking-tight"
+                    >
                         {headline}
                     </h1>
                     <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -87,15 +307,15 @@ const HeroPattern = ({ styles, headline, subheadline, cta, image, variant = "def
                     <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
                         {cta?.map((btn: any, idx: number) => (
                             <Button key={idx} size="lg" variant={btn.variant || "default"} className="gap-2">
-                                 {btn.icon && <LucideIcon name={btn.icon} />}
-                                 {btn.label}
+                                {btn.icon && <LucideIcon name={btn.icon} />}
+                                {btn.label}
                             </Button>
                         ))}
                     </div>
-                 </div>
-                 
-                 {image && (
-                     <div className="w-full max-w-5xl mt-8">
+                </div>
+                
+                {image && (
+                    <div className="w-full max-w-5xl mt-8">
                         <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-border/50">
                             <div className="absolute inset-0 bg-primary/5 mix-blend-overlay"></div>
                             <img 
@@ -104,17 +324,24 @@ const HeroPattern = ({ styles, headline, subheadline, cta, image, variant = "def
                                 className="w-full h-auto object-cover max-h-[600px]" 
                             />
                         </div>
-                     </div>
-                 )}
+                    </div>
+                )}
             </div>
-        )
+        );
     }
 
+    // Minimal Variant (Enhanced)
     if (variant === "minimal") {
         return (
-             <div style={styles} className="flex flex-col justify-center min-h-[50vh] px-8 py-16 w-full bg-background border-b">
-                 <div className="max-w-3xl space-y-4">
-                    <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-foreground">
+            <div 
+                style={{ ...styles, ...containerOverrides }} 
+                className={`flex flex-col justify-center min-h-[50vh] px-8 ${paddingClass} w-full bg-background border-b`}
+            >
+                <div className="max-w-3xl space-y-4">
+                    <h1 
+                        style={headlineOverrides}
+                        className="text-6xl md:text-8xl font-black tracking-tighter text-foreground"
+                    >
                         {headline}
                     </h1>
                     <p className="text-2xl text-muted-foreground border-l-4 border-primary pl-6 py-2">
@@ -123,22 +350,28 @@ const HeroPattern = ({ styles, headline, subheadline, cta, image, variant = "def
                     <div className="flex gap-4 pt-6">
                         {cta?.map((btn: any, idx: number) => (
                             <Button key={idx} size="lg" variant={btn.variant || "default"} className="rounded-full px-8">
-                                 {btn.label}
-                                 {btn.icon && <LucideIcon name={btn.icon} className="ml-2" />}
+                                {btn.label}
+                                {btn.icon && <LucideIcon name={btn.icon} className="ml-2" />}
                             </Button>
                         ))}
                     </div>
-                 </div>
+                </div>
             </div>
-        )
+        );
     }
 
-    // Default Split
+    // Default Variant (Enhanced)
     return (
-        <div style={styles} className="flex flex-col md:flex-row items-center gap-12 px-8 py-20 w-full bg-background">
-             <div className="flex-1 space-y-6 text-center md:text-left">
+        <div 
+            style={{ ...styles, ...containerOverrides }} 
+            className={`flex flex-col md:flex-row items-center gap-12 px-8 ${paddingClass} w-full bg-background`}
+        >
+            <div className="flex-1 space-y-6 text-center md:text-left">
                 <Badge variant="outline" className="mb-2">Highlighted</Badge>
-                <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight lg:text-7xl">
+                <h1 
+                    style={headlineOverrides}
+                    className="text-4xl md:text-6xl font-extrabold tracking-tight lg:text-7xl"
+                >
                     {headline}
                 </h1>
                 <p className="text-xl text-muted-foreground md:w-3/4">
@@ -147,15 +380,15 @@ const HeroPattern = ({ styles, headline, subheadline, cta, image, variant = "def
                 <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-4">
                     {cta?.map((btn: any, idx: number) => (
                         <Button key={idx} size="lg" variant={btn.variant || "default"} className="gap-2 h-12 px-6">
-                             {btn.icon && <LucideIcon name={btn.icon} />}
-                             {btn.label}
+                            {btn.icon && <LucideIcon name={btn.icon} />}
+                            {btn.label}
                         </Button>
                     ))}
                 </div>
-             </div>
-             
-             {image && (
-                 <div className="flex-1 w-full max-w-xl">
+            </div>
+            
+            {image && (
+                <div className="flex-1 w-full max-w-xl">
                     <div className="relative rounded-2xl overflow-hidden shadow-xl ring-1 ring-border/50">
                         <img 
                             src={image.src || "/placeholder.svg"} 
@@ -163,96 +396,394 @@ const HeroPattern = ({ styles, headline, subheadline, cta, image, variant = "def
                             className="w-full h-auto object-cover aspect-video" 
                         />
                     </div>
-                 </div>
-             )}
+                </div>
+            )}
         </div>
-    )
+    );
 }
 
-const FeaturesGridPattern = ({ styles, title, subtitle, items, variant = "grid-3" }: any) => {
+const FeaturesGridPattern = ({ styles, title, subtitle, items, variant = "grid-3", styleIntensity = "standard", _manualOverrides }: any) => {
+    const containerOverrides = _manualOverrides?.container || {};
+    
+    // Intensity-based spacing
+    const intensityClasses = {
+        minimal: "py-12",
+        standard: "py-20",
+        premium: "py-24 md:py-32"
+    };
+    const paddingClass = intensityClasses[styleIntensity as keyof typeof intensityClasses] || intensityClasses.standard;
+    
+    // Bento Modern - Advanced grid with mixed sizes
+    if (variant === "bento-modern" || variant === "bento") {
+        return (
+            <div style={{ ...styles, ...containerOverrides }} className={`${paddingClass} px-6 w-full bg-gradient-to-b from-background to-muted/20`}>
+                <div className="text-center mb-16 max-w-3xl mx-auto space-y-4">
+                    <h2 className="text-3xl font-bold tracking-tighter md:text-5xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">{title}</h2>
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{subtitle}</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-4 auto-rows-fr gap-4 max-w-7xl mx-auto">
+                    {items?.map((item: any, idx: number) => {
+                        const isLarge = idx === 0 || idx === 3;
+                        return (
+                            <Card 
+                                key={idx} 
+                                className={`group bg-gradient-to-br from-card to-card/50 hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 border-muted/50 backdrop-blur-sm ${isLarge ? 'md:col-span-2 md:row-span-2' : ''}`}
+                            >
+                                <CardHeader>
+                                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform duration-300">
+                                        {item.icon && <LucideIcon name={item.icon} size={isLarge ? 32 : 24} />}
+                                    </div>
+                                    <CardTitle className="text-xl group-hover:text-primary transition-colors">{item.title}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-muted-foreground leading-relaxed">
+                                        {item.description}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    }
+    
+    // Card Hover - Enhanced cards with sophisticated hover effects
+    if (variant === "card-hover") {
+        return (
+            <div style={{ ...styles, ...containerOverrides }} className={`${paddingClass} px-6 w-full bg-background`}>
+                <div className="text-center mb-16 max-w-3xl mx-auto space-y-4">
+                    <h2 className="text-3xl font-bold tracking-tighter md:text-5xl">{title}</h2>
+                    <p className="text-lg text-muted-foreground">{subtitle}</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                    {items?.map((item: any, idx: number) => (
+                        <Card 
+                            key={idx} 
+                            className="group relative overflow-hidden bg-card hover:shadow-xl transition-all duration-300 border-muted/50 hover:border-primary/50"
+                        >
+                            {/* Hover gradient overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            
+                            <CardHeader className="relative">
+                                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-6 text-primary group-hover:shadow-lg group-hover:shadow-primary/20 transition-all duration-300">
+                                    {item.icon && <LucideIcon name={item.icon} size={28} />}
+                                </div>
+                                <CardTitle className="text-2xl mb-3">{item.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="relative">
+                                <p className="text-muted-foreground leading-relaxed">
+                                    {item.description}
+                                </p>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+    
+    // List Minimal - Clean, spacious list layout
+    if (variant === "list-minimal" || variant === "list") {
+        return (
+            <div style={{ ...styles, ...containerOverrides }} className={`${paddingClass} px-6 w-full bg-background/50`}>
+                <div className="text-center mb-16 max-w-3xl mx-auto space-y-4">
+                    <h2 className="text-3xl font-bold tracking-tighter md:text-5xl">{title}</h2>
+                    <p className="text-lg text-muted-foreground">{subtitle}</p>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-4 max-w-3xl mx-auto">
+                    {items?.map((item: any, idx: number) => (
+                        <div 
+                            key={idx} 
+                            className="group flex gap-6 items-start p-8 rounded-2xl hover:bg-muted/70 transition-all duration-300 border border-transparent hover:border-border/50"
+                        >
+                            <div className="w-14 h-14 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-300">
+                                {item.icon && <LucideIcon name={item.icon} size={26} />}
+                            </div>
+                            <div className="space-y-2 text-left flex-1">
+                                <h3 className="text-2xl font-bold group-hover:text-primary transition-colors">{item.title}</h3>
+                                <p className="text-muted-foreground leading-relaxed text-lg">{item.description}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+    
+    // Grid Enhanced (Default with enhancements)
     let gridClass = "grid-cols-1 md:grid-cols-3";
-    if (variant === "bento") gridClass = "grid-cols-1 md:grid-cols-4 auto-rows-[minmax(200px,auto)]";
-    if (variant === "list") gridClass = "grid-cols-1 max-w-3xl";
+    if (variant === "grid-2") gridClass = "grid-cols-1 md:grid-cols-2";
+    if (variant === "grid-4") gridClass = "grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
 
     return (
-        <div style={styles} className="py-20 px-6 w-full bg-background/50">
+        <div style={{ ...styles, ...containerOverrides }} className={`${paddingClass} px-6 w-full bg-background/50`}>
             <div className="text-center mb-16 max-w-3xl mx-auto space-y-4">
                 <h2 className="text-3xl font-bold tracking-tighter md:text-5xl">{title}</h2>
                 <p className="text-lg text-muted-foreground">{subtitle}</p>
             </div>
             
             <div className={`grid ${gridClass} gap-6 max-w-7xl mx-auto`}>
-                {items?.map((item: any, idx: number) => {
-                    // Bento logic: Make first item span large if bento
-                    const isLargeBento = variant === "bento" && (idx === 0 || idx === 3);
-                    
-                    if (variant === "list") {
-                        return (
-                            <div key={idx} className="flex gap-6 items-start p-6 rounded-xl hover:bg-muted/50 transition-colors">
-                                <div className="w-12 h-12 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                    {item.icon && <LucideIcon name={item.icon} size={24} />}
-                                </div>
-                                <div className="space-y-2 text-left">
-                                     <h3 className="text-xl font-bold">{item.title}</h3>
-                                     <p className="text-muted-foreground leading-relaxed">{item.description}</p>
-                                </div>
+                {items?.map((item: any, idx: number) => (
+                    <Card key={idx} className="bg-card hover:shadow-lg hover:scale-[1.02] transition-all duration-300 border-muted/50">
+                        <CardHeader>
+                            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
+                                {item.icon && <LucideIcon name={item.icon} size={24} />}
                             </div>
-                        )
-                    }
-
-                    return (
-                        <Card key={idx} className={`bg-card hover:shadow-lg transition-all duration-300 border-muted ${isLargeBento ? 'md:col-span-2 md:row-span-2' : ''}`}>
-                            <CardHeader>
-                                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
-                                    {item.icon && <LucideIcon name={item.icon} size={24} />}
-                                </div>
-                                <CardTitle>{item.title}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground leading-relaxed">
-                                    {item.description}
-                                </p>
-                            </CardContent>
-                        </Card>
-                    )
-                })}
+                            <CardTitle>{item.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-muted-foreground leading-relaxed">
+                                {item.description}
+                            </p>
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
         </div>
-    )
+    );
 }
 
-const CallToActionPattern = ({ styles, title, description, actions }: any) => {
+const CallToActionPattern = ({ styles, title, description, actions, variant = "default", _manualOverrides }: any) => {
+    const containerOverrides = _manualOverrides?.container || {};
+    
+    // Minimal Variant
+    if (variant === "minimal") {
+        return (
+            <div style={{ ...styles, ...containerOverrides }} className="py-16 px-6 w-full border-t border-border/50">
+                <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="text-left space-y-2">
+                        <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
+                        <p className="text-lg text-muted-foreground">
+                            {description}
+                        </p>
+                    </div>
+                    <div className="flex gap-3 shrink-0">
+                        {actions?.map((action: any, idx: number) => (
+                            <Button key={idx} size="lg" variant={action.variant || "default"} className="min-w-[140px]">
+                                {action.label}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+    // Gradient Variant
+    if (variant === "gradient") {
+        return (
+            <div 
+                style={{ 
+                    ...styles, 
+                    ...containerOverrides,
+                    background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)"
+                }} 
+                className="py-24 px-6 w-full relative overflow-hidden"
+            >
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+                
+                <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
+                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white">{title}</h2>
+                    <p className="text-xl text-white/90 max-w-2xl mx-auto">
+                        {description}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                        {actions?.map((action: any, idx: number) => (
+                            <Button 
+                                key={idx} 
+                                size="lg" 
+                                variant={action.variant === "outline" ? "outline" : "secondary"} 
+                                className={`min-w-[150px] ${action.variant === "outline" ? "border-white/30 text-white hover:bg-white/10" : "bg-white text-primary hover:bg-white/90"}`}
+                            >
+                                {action.label}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+    // Split Variant
+    if (variant === "split") {
+        return (
+            <div style={{ ...styles, ...containerOverrides }} className="py-20 px-6 w-full bg-muted/30">
+                <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                    <div className="space-y-4 text-left">
+                        <h2 className="text-4xl font-bold tracking-tight">{title}</h2>
+                        <p className="text-lg text-muted-foreground leading-relaxed">
+                            {description}
+                        </p>
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        {actions?.map((action: any, idx: number) => (
+                            <Button 
+                                key={idx} 
+                                size="lg" 
+                                variant={action.variant || "default"} 
+                                className="w-full justify-center h-14 text-lg"
+                            >
+                                {action.label}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+    // Banner Variant
+    if (variant === "banner") {
+        return (
+            <div style={{ ...styles, ...containerOverrides }} className="py-12 px-6 w-full bg-primary text-primary-foreground">
+                <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="text-left space-y-1">
+                        <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+                        {description && (
+                            <p className="text-base text-primary-foreground/90">
+                                {description}
+                            </p>
+                        )}
+                    </div>
+                    <div className="flex gap-3 shrink-0">
+                        {actions?.map((action: any, idx: number) => (
+                            <Button 
+                                key={idx} 
+                                size="lg" 
+                                variant={action.variant === "outline" ? "outline" : "secondary"} 
+                                className={action.variant === "outline" ? "border-white/30 text-white hover:bg-white/10" : ""}
+                            >
+                                {action.label}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+    // Default Variant (Enhanced)
     return (
-        <div style={styles} className="py-20 px-6 w-full bg-primary/5 border-y border-primary/10">
-             <div className="max-w-4xl mx-auto text-center space-y-8">
+        <div style={{ ...styles, ...containerOverrides }} className="py-20 px-6 w-full bg-primary/5 border-y border-primary/10">
+            <div className="max-w-4xl mx-auto text-center space-y-8">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">{title}</h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                     {description}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     {actions?.map((action: any, idx: number) => (
-                        <Button key={idx} size="lg" variant={action.variant || "default"} className="min-w-[150px]">
+                        <Button key={idx} size="lg" variant={action.variant || "default"} className="min-w-[150px] shadow-md hover:shadow-lg transition-shadow">
                             {action.label}
                         </Button>
                     ))}
                 </div>
-             </div>
+            </div>
         </div>
-    )
+    );
 }
 
-const FooterPattern = ({ styles, branding, columns, copyright, social }: any) => {
+const FooterPattern = ({ styles, branding, columns, copyright, social, variant = "default", _manualOverrides }: any) => {
+    const containerOverrides = _manualOverrides?.container || {};
+    
+    // Minimal Variant
+    if (variant === "minimal") {
+        return (
+            <div style={{ ...styles, ...containerOverrides }} className="py-8 px-6 w-full bg-muted/20 border-t border-border/50">
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                        {branding?.icon && <LucideIcon name={branding.icon} size={20} className="text-primary" />}
+                        <span className="font-medium">{branding?.text}</span>
+                    </div>
+                    <p>{copyright || `© ${new Date().getFullYear()} All rights reserved.`}</p>
+                    <div className="flex gap-4">
+                        {social?.map((s: any, idx: number) => (
+                            <a key={idx} href="#" className="hover:text-primary transition-colors">
+                                <LucideIcon name={s.icon} size={18} />
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+    // Newsletter Variant
+    if (variant === "newsletter") {
+        return (
+            <div style={{ ...styles, ...containerOverrides }} className="py-16 px-6 w-full bg-gradient-to-b from-muted/20 to-muted/40 border-t border-border">
+                <div className="max-w-7xl mx-auto">
+                    {/* Newsletter Section */}
+                    <div className="mb-12 text-center max-w-xl mx-auto">
+                        <h3 className="text-2xl font-bold mb-3">Stay Updated</h3>
+                        <p className="text-muted-foreground mb-6">Subscribe to our newsletter for the latest updates and news.</p>
+                        <div className="flex gap-2">
+                            <Input placeholder="Enter your email" type="email" className="flex-1" />
+                            <Button>Subscribe</Button>
+                        </div>
+                    </div>
+                    
+                    <Separator className="my-8" />
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 mb-4">
+                                {branding?.icon && <LucideIcon name={branding.icon} size={24} className="text-primary" />}
+                                <span className="text-xl font-bold">{branding?.text}</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                                {branding?.description}
+                            </p>
+                        </div>
+                        
+                        {columns?.map((col: any, idx: number) => (
+                            <div key={idx} className="space-y-4">
+                                <h4 className="font-semibold">{col.title}</h4>
+                                <div className="flex flex-col gap-2">
+                                    {col.links?.map((link: any, lIdx: number) => (
+                                        <a key={lIdx} href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                                            {link.label}
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <Separator className="my-8" />
+                    
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+                        <p>{copyright || `© ${new Date().getFullYear()} ${branding?.text}. All rights reserved.`}</p>
+                        <div className="flex gap-4">
+                            {social?.map((s: any, idx: number) => (
+                                <a key={idx} href="#" className="hover:text-primary transition-colors">
+                                    <LucideIcon name={s.icon} size={20} />
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+    // Default Variant (Enhanced)
     return (
-        <div style={styles} className="py-12 px-6 w-full bg-muted/30 border-t border-border">
+        <div style={{ ...styles, ...containerOverrides }} className="py-12 px-6 w-full bg-muted/30 border-t border-border">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
                 <div className="space-y-4">
-                     <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-2 mb-4">
                         {branding?.icon && <LucideIcon name={branding.icon} size={24} className="text-primary" />}
                         <span className="text-xl font-bold">{branding?.text}</span>
-                     </div>
-                     <p className="text-sm text-muted-foreground leading-relaxed">
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                         {branding?.description}
-                     </p>
+                    </p>
                 </div>
                 
                 {columns?.map((col: any, idx: number) => (
@@ -272,7 +803,7 @@ const FooterPattern = ({ styles, branding, columns, copyright, social }: any) =>
             <Separator className="my-8" />
             
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-                <p>{copyright}</p>
+                <p>{copyright || `© ${new Date().getFullYear()} All rights reserved.`}</p>
                 <div className="flex gap-4">
                     {social?.map((s: any, idx: number) => (
                         <a key={idx} href="#" className="hover:text-primary transition-colors">
@@ -282,7 +813,7 @@ const FooterPattern = ({ styles, branding, columns, copyright, social }: any) =>
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 const VisualComponent = ({ component }: { component: ComponentProps }) => {
@@ -406,6 +937,8 @@ const VisualComponent = ({ component }: { component: ComponentProps }) => {
   }
 };
 
+
+// It renders whatever components exist in the designIntent.screens[].children array
 const ScreenRenderer = ({ designIntent, screenId }: { designIntent: any, screenId?: string }) => {
   if (!designIntent) return null;
   
@@ -421,13 +954,21 @@ const ScreenRenderer = ({ designIntent, screenId }: { designIntent: any, screenI
   if (!screen) return <div className="p-4 text-red-500">Screen not found</div>;
 
   const ds = designIntent.designSystem || {};
+  
+  // Enhanced CSS variables with proper HSL conversion and fallbacks
   const cssVars: any = {
-    '--primary-main': ds.colorPalette?.primary?.main,
-    '--secondary-main': ds.colorPalette?.secondary?.main,
-    '--bg-default': ds.colorPalette?.background?.default,
-    '--bg-paper': ds.colorPalette?.background?.paper,
-    '--text-primary': ds.colorPalette?.text?.primary,
-    '--text-secondary': ds.colorPalette?.text?.secondary,
+    '--primary': ds.colorPalette?.primary?.main || '222.2 47.4% 11.2%',
+    '--primary-foreground': ds.colorPalette?.primary?.light || '210 40% 98%',
+    '--secondary': ds.colorPalette?.secondary?.main || '210 40% 96.1%',
+    '--secondary-foreground': ds.colorPalette?.secondary?.dark || '222.2 47.4% 11.2%',
+    '--background': ds.colorPalette?.background?.default || '0 0% 100%',
+    '--foreground': ds.colorPalette?.text?.primary || '222.2 47.4% 11.2%',
+    '--card': ds.colorPalette?.background?.paper || '0 0% 100%',
+    '--card-foreground': ds.colorPalette?.text?.primary || '222.2 47.4% 11.2%',
+    '--muted': ds.colorPalette?.background?.elevated || '210 40% 96.1%',
+    '--muted-foreground': ds.colorPalette?.text?.secondary || '215.4 16.3% 46.9%',
+    '--border': ds.effects?.borderRadius ? '214.3 31.8% 91.4%' : '214.3 31.8% 91.4%',
+    '--radius': ds.effects?.borderRadius?.medium || '0.5rem',
   };
 
   return (
@@ -435,13 +976,15 @@ const ScreenRenderer = ({ designIntent, screenId }: { designIntent: any, screenI
       className="screen-renderer-root w-full h-full overflow-y-auto" 
       style={{
         ...cssVars,
-        backgroundColor: screen.styles?.backgroundColor || 'var(--bg-default)',
-        fontFamily: ds.typography?.fontFamily,
+        backgroundColor: screen.styles?.backgroundColor || 'hsl(var(--background))',
+        color: 'hsl(var(--foreground))',
+        fontFamily: ds.typography?.fontFamily || 'system-ui, sans-serif',
         padding: screen.styles?.paddingTop || '0px',
         display: 'flex',
         flexDirection: 'column'
       }}
     >
+      {/* Dynamic rendering - only render components that exist in the design intent */}
       {screen.children?.map((child: ComponentProps, idx: number) => (
         <VisualComponent key={idx} component={child} />
       ))}
