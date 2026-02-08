@@ -92,11 +92,12 @@ export function ProjectProvider({
             const colors = selectedTheme.colors;
             
             newIntent.designSystem.colorPalette = {
-                primary: { main: colors.primary, light: colors.primary, dark: colors.primary }, // Simplified mapping
+                primary: { main: colors.primary, light: colors.primary, dark: colors.primary }, 
                 secondary: { main: colors.secondary, light: colors.secondary, dark: colors.secondary },
-                background: { default: colors.background, paper: colors.card },
-                text: { primary: colors.foreground, secondary: colors.mutedForeground },
-                action: { active: colors.accent, hover: colors.accent } // Example mapping
+                background: { default: colors.background, paper: colors.card, elevated: colors.muted },
+                text: { primary: colors.foreground, secondary: colors.mutedForeground, disabled: colors.mutedForeground },
+                semantic: { success: colors.accent, warning: colors.accent, error: colors.destructive, info: colors.primary },
+                action: { active: colors.accent, hover: colors.accent } 
             };
             
             // Should properly map all properties eventually

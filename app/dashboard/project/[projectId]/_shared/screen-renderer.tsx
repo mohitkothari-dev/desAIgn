@@ -44,26 +44,26 @@ const NavbarPattern = ({ styles, branding, links, actions, variant = "solid", _m
     
     if (isFloating) {
         bgStyle = { 
-            backgroundColor: 'hsl(var(--card) / 0.8)', 
+            backgroundColor: 'color-mix(in srgb, var(--card), transparent 20%)', 
             backdropFilter: 'blur(12px)',
-            boxShadow: '0 4px 30px hsl(var(--foreground) / 0.1)'
+            boxShadow: '0 4px 30px color-mix(in srgb, var(--foreground), transparent 90%)'
         };
         borderColor = 'border-border/50';
     } else if (isGlassmorphic) {
         bgStyle = {
-            background: 'linear-gradient(135deg, hsl(var(--card) / 0.7) 0%, hsl(var(--card) / 0.5) 100%)',
+            background: 'linear-gradient(135deg, color-mix(in srgb, var(--card), transparent 30%) 0%, color-mix(in srgb, var(--card), transparent 50%) 100%)',
             backdropFilter: 'blur(16px)',
-            borderBottom: '1px solid hsl(var(--border) / 0.3)'
+            borderBottom: '1px solid color-mix(in srgb, var(--border), transparent 70%)'
         };
         borderStyle = '';
     } else if (isTransparent) {
         bgStyle = { backgroundColor: 'transparent' };
         borderColor = 'border-transparent';
     } else if (isMinimal) {
-        bgStyle = { backgroundColor: 'hsl(var(--background))' };
+        bgStyle = { backgroundColor: 'var(--background)' };
         borderColor = 'border-border/30';
     } else {
-        bgStyle = { backgroundColor: 'hsl(var(--card))' };
+        bgStyle = { backgroundColor: 'var(--card)' };
     }
     
     return (
@@ -125,8 +125,8 @@ const HeroPattern = ({ styles, headline, subheadline, cta, image, variant = "def
                     ...styles, 
                     ...containerOverrides,
                     background: effects?.gradient === "sunset" 
-                        ? "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)"
-                        : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                        ? "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent, #f093fb) 100%)"
+                        : "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)",
                     position: "relative",
                     overflow: "hidden"
                 }} 
@@ -134,13 +134,13 @@ const HeroPattern = ({ styles, headline, subheadline, cta, image, variant = "def
             >
                 {/* Animated background effect */}
                 <div className="absolute inset-0 opacity-30">
-                    <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
-                    <div className="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
-                    <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
+                    <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/30 rounded-full mix-blend-multiply filter blur-xl animate-blob"></div>
+                    <div className="absolute top-0 -right-4 w-72 h-72 bg-secondary/30 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-2000"></div>
+                    <div className="absolute -bottom-8 left-20 w-72 h-72 bg-accent/30 rounded-full mix-blend-multiply filter blur-xl animate-blob animation-delay-4000"></div>
                 </div>
                 
                 <div className="max-w-4xl space-y-6 relative z-10">
-                    <Badge variant="secondary" className="mb-2 mx-auto w-fit backdrop-blur-sm bg-white/20 text-white border-white/30">
+                    <Badge variant="secondary" className="mb-2 mx-auto w-fit backdrop-blur-sm bg-background/20 text-foreground border-foreground/30">
                         ✨ New Features
                     </Badge>
                     <h1 
@@ -158,7 +158,7 @@ const HeroPattern = ({ styles, headline, subheadline, cta, image, variant = "def
                                 key={idx} 
                                 size="lg" 
                                 variant={btn.variant || "default"} 
-                                className="gap-2 bg-white text-purple-900 hover:bg-white/90 shadow-xl"
+                                className="gap-2 shadow-xl"
                             >
                                 {btn.icon && <LucideIcon name={btn.icon} />}
                                 {btn.label}
@@ -428,7 +428,7 @@ const FeaturesGridPattern = ({ styles, title, subtitle, items, variant = "grid-3
                         return (
                             <Card 
                                 key={idx} 
-                                className={`group bg-gradient-to-br from-card to-card/50 hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 border-muted/50 backdrop-blur-sm ${isLarge ? 'md:col-span-2 md:row-span-2' : ''}`}
+                                className={`group bg-gradient-to-br from-card to-muted/50 hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 border-muted/50 backdrop-blur-sm ${isLarge ? 'md:col-span-2 md:row-span-2' : ''}`}
                             >
                                 <CardHeader>
                                     <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform duration-300">
@@ -580,13 +580,13 @@ const CallToActionPattern = ({ styles, title, description, actions, variant = "d
                 style={{ 
                     ...styles, 
                     ...containerOverrides,
-                    background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%)"
+                    background: "linear-gradient(135deg, var(--primary) 0%, color-mix(in srgb, var(--primary), transparent 20%) 100%)"
                 }} 
                 className="py-24 px-6 w-full relative overflow-hidden"
             >
                 {/* Decorative elements */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 w-96 h-96 bg-primary-foreground/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary-foreground/10 rounded-full blur-3xl" />
                 
                 <div className="max-w-4xl mx-auto text-center space-y-8 relative z-10">
                     <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white">{title}</h2>
@@ -599,7 +599,7 @@ const CallToActionPattern = ({ styles, title, description, actions, variant = "d
                                 key={idx} 
                                 size="lg" 
                                 variant={action.variant === "outline" ? "outline" : "secondary"} 
-                                className={`min-w-[150px] ${action.variant === "outline" ? "border-white/30 text-white hover:bg-white/10" : "bg-white text-primary hover:bg-white/90"}`}
+                                className={`min-w-[150px] ${action.variant === "outline" ? "border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10" : "bg-primary-foreground text-primary hover:bg-primary-foreground/90"}`}
                             >
                                 {action.label}
                             </Button>
@@ -657,7 +657,7 @@ const CallToActionPattern = ({ styles, title, description, actions, variant = "d
                                 key={idx} 
                                 size="lg" 
                                 variant={action.variant === "outline" ? "outline" : "secondary"} 
-                                className={action.variant === "outline" ? "border-white/30 text-white hover:bg-white/10" : ""}
+                                className={action.variant === "outline" ? "border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10" : ""}
                             >
                                 {action.label}
                             </Button>
@@ -955,20 +955,29 @@ const ScreenRenderer = ({ designIntent, screenId }: { designIntent: any, screenI
 
   const ds = designIntent.designSystem || {};
   
-  // Enhanced CSS variables with proper HSL conversion and fallbacks
+  // Consolidated HEX-only CSS variables with proper fallbacks and AI-intuitive mappings
   const cssVars: any = {
-    '--primary': ds.colorPalette?.primary?.main || '222.2 47.4% 11.2%',
-    '--primary-foreground': ds.colorPalette?.primary?.light || '210 40% 98%',
-    '--secondary': ds.colorPalette?.secondary?.main || '210 40% 96.1%',
-    '--secondary-foreground': ds.colorPalette?.secondary?.dark || '222.2 47.4% 11.2%',
-    '--background': ds.colorPalette?.background?.default || '0 0% 100%',
-    '--foreground': ds.colorPalette?.text?.primary || '222.2 47.4% 11.2%',
-    '--card': ds.colorPalette?.background?.paper || '0 0% 100%',
-    '--card-foreground': ds.colorPalette?.text?.primary || '222.2 47.4% 11.2%',
-    '--muted': ds.colorPalette?.background?.elevated || '210 40% 96.1%',
-    '--muted-foreground': ds.colorPalette?.text?.secondary || '215.4 16.3% 46.9%',
-    '--border': ds.effects?.borderRadius ? '214.3 31.8% 91.4%' : '214.3 31.8% 91.4%',
+    // Standard variables
+    '--primary': ds.colorPalette?.primary?.main || '#0f172a',
+    '--primary-foreground': ds.colorPalette?.primary?.light || '#f8fafc',
+    '--secondary': ds.colorPalette?.secondary?.main || '#f1f5f9',
+    '--secondary-foreground': ds.colorPalette?.secondary?.dark || '#0f172a',
+    '--background': ds.colorPalette?.background?.default || '#ffffff',
+    '--foreground': ds.colorPalette?.text?.primary || '#0f172a',
+    '--card': ds.colorPalette?.background?.paper || '#ffffff',
+    '--card-foreground': ds.colorPalette?.text?.primary || '#0f172a',
+    '--muted': ds.colorPalette?.background?.elevated || '#f1f5f9',
+    '--muted-foreground': ds.colorPalette?.text?.secondary || '#64748b',
+    '--border': ds.effects?.borderRadius ? '#e2e8f0' : '#e2e8f0',
     '--radius': ds.effects?.borderRadius?.medium || '0.5rem',
+
+    // AI-Intuitive and semantic mappings
+    '--primary-main': ds.colorPalette?.primary?.main || '#0f172a',
+    '--secondary-main': ds.colorPalette?.secondary?.main || '#f1f5f9',
+    '--bg-default': ds.colorPalette?.background?.default || '#ffffff',
+    '--bg-paper': ds.colorPalette?.background?.paper || '#ffffff',
+    '--text-primary': ds.colorPalette?.text?.primary || '#0f172a',
+    '--text-secondary': ds.colorPalette?.text?.secondary || '#64748b',
   };
 
   return (
@@ -976,8 +985,8 @@ const ScreenRenderer = ({ designIntent, screenId }: { designIntent: any, screenI
       className="screen-renderer-root w-full h-full overflow-y-auto" 
       style={{
         ...cssVars,
-        backgroundColor: screen.styles?.backgroundColor || 'hsl(var(--background))',
-        color: 'hsl(var(--foreground))',
+        backgroundColor: screen.styles?.backgroundColor || 'var(--background)',
+        color: 'var(--foreground)',
         fontFamily: ds.typography?.fontFamily || 'system-ui, sans-serif',
         padding: screen.styles?.paddingTop || '0px',
         display: 'flex',
