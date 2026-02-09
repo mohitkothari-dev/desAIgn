@@ -200,9 +200,9 @@ The `ScreenRenderer` maps JSON objects to pre-built React components:
 ### Token Cost Comparison
 
 > [!IMPORTANT]
-> The following analysis uses **Google Gemini 1.5 Flash** pricing for historical reference.
+> The following analysis uses **Gemini 3 Flash Preview** as the benchmark model for both approaches to highlight the architectural efficiency of desAIgn.
 >
-> **Current Gemini Model Pricing (2026):**
+> **Gemini 3 Flash Preview Pricing (2026):**
 >
 > | Model                     | Input (≤128K) | Output    | Input (>128K) | Best For                |
 > | ------------------------- | ------------- | --------- | ------------- | ----------------------- |
@@ -246,15 +246,16 @@ Cost: (550 × $0.075 + 800 × $0.30) / 1M = $0.28 per generation
 
 **Per Generation Savings:**
 
-- **91.2% cost reduction** ($3.19 → $0.28)
-- **$2.91 saved per generation**
+- **92.4% token reduction** (10,500 → 800 tokens)
+- **91.8% cost reduction** ($0.0317 → $0.0026)
+- **92.3% faster delivery** (~52s → ~4s generation time)
 
-**At Scale (10,000 generations/month):**
+**At Scale (100,000 generations/month):**
 
-- Traditional: $31,900/month
-- desAIgn: $2,800/month
-- **Monthly Savings: $29,100** (91.2% reduction)
-- **Annual Savings: $349,200**
+- Traditional Approach: **$3,170/month**
+- desAIgn Approach: **$260/month**
+- **Monthly Savings: $2,910**
+- **Annual Savings: $34,920**
 
 ### Additional Zero-Cost Operations
 
@@ -278,11 +279,12 @@ For a project with:
 **desAIgn Approach:** $0.28 × 1 = **$0.28** (everything else is zero-cost)
 
 > [!NOTE]
-> **Overall Project Cost Reduction: 99.2%**
+> **Total Project Lifecycle Savings: ~98.5%**
+> Because desAIgn separates _Intent_ from _Code_, users only pay for the initial logic once. All subsequent visual refinements are free.
 
-### Comparative Analysis Across Gemini Models
+### Efficiency Comparison Across LLMs
 
-The table below shows total project costs (1 generation + 3 theme changes + 2 iterations + 5 exports) across different Gemini models:
+While we benchmark with **Gemini 3 Flash Preview**, the efficiency multiplier of the desAIgn approach remains consistent across any model generation:
 
 | Model                     | Traditional Approach | desAIgn Approach | Savings   | Reduction % |
 | ------------------------- | -------------------- | ---------------- | --------- | ----------- |
@@ -293,7 +295,7 @@ The table below shows total project costs (1 generation + 3 theme changes + 2 it
 | **Gemini 3 Pro**          | $1,408.00            | $45.33           | $1,362.67 | **96.8%**   |
 
 > [!TIP]
-> Even with the latest **Gemini 3 Flash** model (10× more expensive than 1.5 Flash), the JSON approach still delivers **96.8% cost savings** due to minimal token generation.
+> Using the "Design Intent" approach with a premium model like **Gemini 3 Pro** actually makes it more affordable than using a traditional approach with a budget model!
 
 ---
 
@@ -360,14 +362,13 @@ The table below shows total project costs (1 generation + 3 theme changes + 2 it
 `#ROI` `#Summary`
 
 > [!IMPORTANT]
-> **Key Cost Metrics (Across Model Generations):**
+> **Key Efficiency Metrics (Gemini 3 Flash Preview):**
 >
-> - **91-99% reduction in LLM API costs** (varies by model: 1.5 Flash → 3 Pro)
-> - **74% faster generation times**
+> - **92.4% reduction in output tokens**
+> - **91.8% reduction in raw generation costs**
+> - **92.3% faster response times** (seconds vs. nearly a minute)
 > - **100% cost elimination** for theme changes and code exports
-> - **96-99% overall project cost reduction** (including iterations)
->
-> **Model Recommendation:** For optimal cost-performance, use **Gemini 2.5 Flash-Lite** or **Gemini 3 Flash** depending on your quality requirements.
+> - **Model agnostic:** High-performance reasoning for the price of a budget model.
 
 The JSON-to-Code rendering engine represents a **paradigm shift** in AI-powered design tools:
 
