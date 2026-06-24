@@ -175,13 +175,106 @@ COMPONENT LIBRARY SPECIFICATION
 13. FOOTER: (Website Only)
     - "type": "Footer", "branding": {...}, "columns": [...]
 
+14. ACCORDION: Expandable content panels.
+    - "type": "Accordion"
+    - "defaultValue": "item-1" (optional, which item is open by default)
+    - "items": [{ "value": "item-1", "trigger": "Title", "content": "Description" }]
+
+15. TABS: Clickable tab switches with content panels.
+    - "type": "Tabs"
+    - "defaultValue": "tab1" (optional, which tab is active by default)
+    - "tabs": [{ "value": "tab1", "label": "Tab 1", "content": [Component] }]
+
+16. SWITCH: Toggle controls for boolean values.
+    - "type": "Switch"
+    - "label": "Label text"
+    - "checked": true/false (optional, default state)
+
+17. TABLE: Data grid with headers and rows.
+    - "type": "Table"
+    - "headers": ["Column 1", "Column 2", "Column 3"]
+    - "rows": [["Cell 1", "Cell 2", "Cell 3"], [...]]
+
+18. ALERT: Boxed callouts for notifications.
+    - "type": "Alert"
+    - "variant": "default" | "destructive"
+    - "title": "Alert Title"
+    - "description": "Alert description text"
+
+19. PROGRESS: Value bars for metrics.
+    - "type": "Progress"
+    - "value": 65 (0-100 percentage)
+    - "label": "Loading..." (optional)
+
+20. AVATAR: User image with fallback.
+    - "type": "Avatar"
+    - "src": "image-url" (optional)
+    - "fallback": "JD" (initials when no image)
+    - "size": "sm" | "default" | "lg" | "xl"
+
+21. AVATAR GROUP: Clustered avatars.
+    - "type": "AvatarGroup"
+    - "avatars": [{ "src": "...", "fallback": "AB" }]
+    - "limit": 3 (max to show before +X)
+
+22. CAROUSEL: Slide-based content containers.
+    - "type": "Carousel"
+    - "items": [Component] (array of components to slide through)
+    - "orientation": "horizontal" | "vertical"
+    - "showControls": true/false
+
+23. BADGE: Accent pills with icon support.
+    - "type": "Badge"
+    - "variant": "default" | "secondary" | "outline" | "destructive"
+    - "content": "Badge text"
+    - "iconName": "lucide:icon-name" (optional)
+
+24. SEPARATOR: Section dividers.
+    - "type": "Separator"
+    - "orientation": "horizontal" | "vertical"
+
+──────────────
+LAYOUT CONFIGURATION
+──────────────
+1. FLEXBOX LAYOUTS (layoutConfig):
+   - "display": "flex"
+   - "flexDirection": "row" | "column" | "row-reverse" | "column-reverse"
+   - "gap": "8px" | "16px" | "24px" | "32px" | "48px"
+   - "alignItems": "stretch" | "flex-start" | "center" | "flex-end" | "baseline"
+   - "justifyContent": "flex-start" | "center" | "space-between" | "space-around" | "space-evenly" | "flex-end"
+   - "flexWrap": "nowrap" | "wrap" | "wrap-reverse"
+
+2. GRID LAYOUTS (gridConfig):
+   - "display": "grid"
+   - "templateColumns": "1fr 1fr 1fr" | "repeat(3, 1fr)" | "repeat(auto-fit, minmax(300px, 1fr))"
+   - "templateRows": "auto auto" | "repeat(2, 1fr)"
+   - "gap": "16px" | "24px" | "32px"
+   - "columnGap": "16px"
+   - "rowGap": "16px"
+   - "justifyItems": "start" | "center" | "end" | "stretch"
+   - "alignItems": "start" | "center" | "end" | "stretch"
+
+3. GRID ITEM SPANNING:
+   - "colSpan": 1 | 2 | 3 | "full" (how many columns the item spans)
+   - "rowSpan": 1 | 2 | 3 (how many rows the item spans)
+   - "colStart": 1 | 2 | 3 | "auto" (grid column start position)
+   - "colEnd": 1 | 2 | 3 | "auto" (grid column end position)
+
+4. ABSOLUTE POSITIONING:
+   - "position": "absolute" | "relative" | "fixed" | "sticky"
+   - "top": "0" | "16px" | "50%"
+   - "right": "0" | "16px"
+   - "bottom": "0" | "16px"
+   - "left": "0" | "16px"
+   - "zIndex": 1 | 10 | 50 | 100
+
 ──────────────
 DESIGN PRINCIPLES
 ──────────────
 1. COLOR: WCAG AA contrast. Clear hierarchy.
 2. TYPOGRAPHY: Readable scale.
 3. COMPONENTS: Consistent spacing (8px grid).
-4. DATA: Realism (use '¥', '$', real names).
+4. DATA: Realism (use '¥', '
 `;
 
 export const MOBILE_DESIGN_PROMPT = `

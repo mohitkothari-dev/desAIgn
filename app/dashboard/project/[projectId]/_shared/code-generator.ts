@@ -118,9 +118,15 @@ export const generateReactCode = (designIntent: any, screenId?: string) => {
         return `${spaces}<Input ${generateProps(rest)} placeholder="${comp.placeholder || ''}" />`;
     }
     if (type === 'Card' || (type === 'Container' && (comp.styles?.shadow || comp.styles?.borderWidth))) {
-        return `${spaces}<Card ${serializeStyles(comp.styles)} className="overflow-hidden">\n` +
-               `${spaces}  <CardContent className="p-0">\n` +
-               (children || []).map((c: any) => renderComponent(c, indent + 2)).join('\n') + '\n' +
+        return `${spaces}<Card ${serializeStyles(comp.styles)} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">\n` +
+               (comp.title || comp.description ? 
+               `${spaces}  <CardHeader>\n` +
+               (comp.title ? `${spaces}    <CardTitle>${comp.title}</CardTitle>\n` : '') +
+               (comp.description ? `${spaces}    <CardDescription>${comp.description}</CardDescription>\n` : '') +
+               `${spaces}  </CardHeader>\n` : '') +
+               `${spaces}  <CardContent className="${!(comp.title || comp.description) ? 'pt-6' : ''}">\n` +
+               (comp.content ? `${spaces}    <p className="text-muted-foreground mb-4">${comp.content}</p>\n` : '') +
+               (children || []).map((c: any) => renderComponent(c, indent + 4)).join('\n') + '\n' +
                `${spaces}  </CardContent>\n` +
                `${spaces}</Card>`;
     }
@@ -131,24 +137,36 @@ export const generateReactCode = (designIntent: any, screenId?: string) => {
         return `${spaces}<img src="${comp.src}" alt="${comp.alt}" className="w-full h-auto rounded-lg" />`;
     }
     if (type === 'Text') {
-        if (comp.variant === 'h1') return `${spaces}<h1 className="text-4xl font-bold">${content}</h1>`;
-        if (comp.variant === 'h2') return `${spaces}<h2 className="text-2xl font-semibold">${content}</h2>`;
+        if (comp.variant === 'h1') return `${spaces}<h1 className="text-4xl md:text-5xl font-extrabold tracking-tight lg:text-6xl">${content}</h1>`;
+        if (comp.variant === 'h2') return `${spaces}<h2 className="text-3xl font-semibold tracking-tight first:mt-0">${content}</h2>`;
+        if (comp.variant === 'h3') return `${spaces}<h3 className="text-2xl font-semibold tracking-tight">${content}</h3>`;
         if (comp.variant === 'caption') return `${spaces}<span className="text-sm text-muted-foreground">${content}</span>`;
-        return `${spaces}<p className="text-base">${content}</p>`;
+        if (comp.variant === 'body') return `${spaces}<p className="leading-7 [&:not(:first-child)]:mt-6">${content}</p>`;
+        return `${spaces}<p className="leading-7">${content}</p>`;
     }
 
-    // Default Container
+    // Default Container — honour tailwindClasses from JSON if present
+    const containerClass = comp.tailwindClasses
+      ? comp.tailwindClasses
+      : 'flex flex-col gap-4';
     const childrenCode = children ? children.map((c: any) => renderComponent(c, indent + 2)).join('\n') : '';
-    return `${spaces}<div ${serializeStyles(comp.styles)} className="flex flex-col gap-4">\n${childrenCode}\n${spaces}</div>`;
+    return `${spaces}<div ${serializeStyles(comp.styles)} className="${containerClass}">\n${childrenCode}\n${spaces}</div>`;
   };
 
-  return `import React from 'react';
+  return `import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import * as LucideIcons from "lucide-react";
 
 export default function ${componentName}() {
